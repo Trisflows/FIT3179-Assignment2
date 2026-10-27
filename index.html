@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is Australia actually getting better at recycling?</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
+    
+    <!-- Vega & Vega-Lite JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #1b4332;
+        }
+        h1 {
+            font-size: 60px;
+        }
+        .chart-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+        .vis-container {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Recycling & Waste Management: <br> How has Australia been improving?</h1>
+    <p><strong>Author:</strong> Tristan Wen Ern Tan 34077049 | <strong>Date:</strong> 27 October 2026</p>
+    <p>Australia targets an ambitious 80% average resource recovery rate by 2030. This visualisation</p>
+    <hr>
+
+    <!-- SECTION 1 -->
+    <h2>Global & National Overview</h2>
+    <div class="pure-g">
+        <div class="pure-u-1 chart-card">
+            <div id="map1" class="vis-container"></div>
+            <script>
+                vegaEmbed('#flow_map', 'flow_map.json', {"actions": false}).catch(console.error);
+            </script>
+        </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <h2>Section 2: Australia's Regional Recycling Performance</h2>
+    <div class="pure-g">
+        <div class="pure-u-1 chart-card">
+            <div id="map2" class="vis-container"></div>
+        </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <h2>Section 3: Interactive Multi-View Exploration</h2>
+    <div class="pure-g">
+        <div class="pure-u-1 chart-card">
+            <div id="multiview" class="vis-container"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Embed Vega-Lite visualisations
+    vegaEmbed('#map1', 'chart1_global_map.json', {"actions": false}).catch(console.error);
+    vegaEmbed('#map2', 'chart2_aus_map.json', {"actions": false}).catch(console.error);
+    vegaEmbed('#multiview', 'chart3_multiview.json', {"actions": false}).catch(console.error);
+</script>
+
+</body>
+</html>

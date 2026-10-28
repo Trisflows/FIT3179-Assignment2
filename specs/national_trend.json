@@ -1,0 +1,229 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "National resource recovery rate 2006-07 to 2024-25 against the 80% target, with a linear projection of the post-2019 trend.",
+  "width": "container",
+  "height": 360,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/national_rate.csv",
+    "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number", "generated_mt": "number"}}
+  },
+  "encoding": {
+    "x": {
+      "field": "fy_end",
+      "type": "quantitative",
+      "title": "Financial year",
+      "scale": {"domain": [2006.5, 2031]},
+      "axis": {
+        "values": [2007, 2010, 2013, 2016, 2019, 2022, 2025, 2030],
+        "labelExpr": "(datum.value - 1) + '–' + substring(toString(datum.value), 2, 4)",
+        "grid": false
+      }
+    },
+    "y": {
+      "field": "rate",
+      "type": "quantitative",
+      "title": "Share of waste recovered (%)",
+      "scale": {"domain": [40, 85]},
+      "axis": {"values": [40, 50, 60, 70, 80]}
+    }
+  },
+  "layer": [
+    {
+      "description": "Shaded band marks the period since the 80% target was set (2019).",
+      "data": {"values": [{"start": 2019, "end": 2031}]},
+      "mark": {"type": "rect", "color": "#f1f5ee"},
+      "encoding": {
+        "x": {"field": "start", "type": "quantitative"},
+        "x2": {"field": "end"},
+        "y": {"value": 0},
+        "y2": {"value": 360}
+      }
+    },
+    {
+      "data": {"values": [{"x": 2019.15, "label": "Target set in 2019 →"}]},
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "baseline": "top",
+        "dy": 6,
+        "fontSize": 11,
+        "color": "#5b7a5e",
+        "fontStyle": "italic"
+      },
+      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"value": 0}, "text": {"field": "label"}}
+    },
+    {
+      "description": "The 80% target line",
+      "data": {"values": [{"target": 80, "fy_end": 2006.5, "end": 2031}]},
+      "mark": {"type": "rule", "color": "#1b4332", "strokeDash": [6, 4], "strokeWidth": 1.5},
+      "encoding": {
+        "y": {"field": "target", "type": "quantitative"},
+        "x": {"field": "fy_end", "type": "quantitative"},
+        "x2": {"field": "end"}
+      }
+    },
+    {
+      "data": {"values": [{"target": 80, "x": 2007, "label": "2030 target: 80% of all waste recovered"}]},
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dy": -8,
+        "fontSize": 12,
+        "fontWeight": 600,
+        "color": "#1b4332"
+      },
+      "encoding": {
+        "x": {"field": "x", "type": "quantitative"},
+        "y": {"field": "target", "type": "quantitative"},
+        "text": {"field": "label"}
+      }
+    },
+    {
+      "description": "Projection: straight-line fit of the 2018-19 to 2024-25 rates, extended to 2029-30",
+      "transform": [
+        {"filter": "datum.series == 'All waste' && datum.fy_end >= 2019"},
+        {"regression": "rate", "on": "fy_end", "extent": [2025, 2030]}
+      ],
+      "mark": {"type": "line", "color": "#2d6a4f", "strokeDash": [3, 4], "strokeWidth": 2}
+    },
+    {
+      "transform": [
+        {"filter": "datum.series == 'All waste' && datum.fy_end >= 2019"},
+        {"regression": "rate", "on": "fy_end", "extent": [2025, 2030]},
+        {"filter": "datum.fy_end == 2030"},
+        {
+          "calculate": "['At this pace: about ' + format(datum.rate, '.0f') + '% by 2029–30,', format(80 - datum.rate, '.0f') + ' points short of the target']",
+          "as": "label"
+        }
+      ],
+      "layer": [
+        {
+          "mark": {
+            "type": "point",
+            "shape": "circle",
+            "size": 50,
+            "color": "#2d6a4f",
+            "fill": "white",
+            "strokeWidth": 2
+          }
+        },
+        {
+          "mark": {
+            "type": "text",
+            "align": "right",
+            "dx": 6,
+            "dy": -30,
+            "fontSize": 12,
+            "fontWeight": 600,
+            "color": "#2d6a4f"
+          },
+          "encoding": {"text": {"field": "label"}}
+        }
+      ]
+    },
+    {
+      "mark": {"type": "line", "strokeWidth": 2.5, "point": {"filled": true, "size": 36}},
+      "encoding": {
+        "color": {
+          "field": "series",
+          "type": "nominal",
+          "scale": {"domain": ["All waste", "Excluding building rubble"], "range": ["#2d6a4f", "#b08968"]},
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "Year", "type": "nominal", "title": "Financial year"},
+          {"field": "series", "type": "nominal", "title": "Measure"},
+          {"field": "rate", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"},
+          {
+            "field": "generated_mt",
+            "type": "quantitative",
+            "title": "Waste generated (million tonnes)",
+            "format": ".1f"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Direct label for the all-waste line (above its last point, clear of the projection)",
+      "transform": [
+        {"filter": "datum.series == 'All waste' && datum.fy_end == 2025"},
+        {"calculate": "'All waste ' + datum.rate + '%'", "as": "label"}
+      ],
+      "mark": {"type": "text", "align": "center", "dy": -14, "fontSize": 12, "fontWeight": 600},
+      "encoding": {
+        "text": {"field": "label"},
+        "color": {
+          "field": "series",
+          "type": "nominal",
+          "scale": {"domain": ["All waste", "Excluding building rubble"], "range": ["#2d6a4f", "#b08968"]},
+          "legend": null
+        }
+      }
+    },
+    {
+      "description": "Direct label for the excluding-rubble line",
+      "transform": [
+        {"filter": "datum.series != 'All waste' && datum.fy_end == 2025"},
+        {"calculate": "'Without rubble ' + datum.rate + '%'", "as": "label"}
+      ],
+      "mark": {"type": "text", "align": "left", "dx": 8, "fontSize": 12, "fontWeight": 600},
+      "encoding": {
+        "text": {"field": "label"},
+        "color": {
+          "field": "series",
+          "type": "nominal",
+          "scale": {"domain": ["All waste", "Excluding building rubble"], "range": ["#2d6a4f", "#b08968"]},
+          "legend": null
+        }
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {"x": 2011, "y": 50.5, "label": "Concrete, bricks and soil from building sites"},
+          {"x": 2011, "y": 48.3, "label": "are 35% of all waste and 86% is recovered."},
+          {"x": 2011, "y": 46.1, "label": "Take them out and the rate has barely moved."}
+        ]
+      },
+      "mark": {"type": "text", "align": "left", "fontSize": 11.5, "color": "#8a6a4f"},
+      "encoding": {
+        "x": {"field": "x", "type": "quantitative"},
+        "y": {"field": "y", "type": "quantitative"},
+        "text": {"field": "label"}
+      }
+    },
+    {
+      "data": {
+        "values": [
+          {
+            "x": 2012,
+            "y": 41.5,
+            "label": "No national data was collated for 2007–08, 2011–12 or 2012–13"
+          }
+        ]
+      },
+      "mark": {"type": "text", "align": "center", "fontSize": 10.5, "color": "#888"},
+      "encoding": {
+        "x": {"field": "x", "type": "quantitative"},
+        "y": {"field": "y", "type": "quantitative"},
+        "text": {"field": "label"}
+      }
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    },
+    "legend": {"labelFontSize": 12, "titleFontSize": 12}
+  }
+}

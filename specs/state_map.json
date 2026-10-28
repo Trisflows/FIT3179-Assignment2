@@ -1,0 +1,316 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Coordinated views: choropleth of each state's resource recovery rate for the chosen year (left) and every state's rate over time (right). Click a state on the map to highlight it on the line chart.",
+  "params": [
+    {
+      "name": "Year_selection",
+      "value": "2024-25",
+      "bind": {
+        "input": "select",
+        "name": "Financial year shown on the map: ",
+        "options": [
+          "2006-07",
+          "2008-09",
+          "2009-10",
+          "2010-11",
+          "2013-14",
+          "2014-15",
+          "2015-16",
+          "2016-17",
+          "2017-18",
+          "2018-19",
+          "2019-20",
+          "2020-21",
+          "2021-22",
+          "2022-23",
+          "2023-24",
+          "2024-25"
+        ],
+        "labels": [
+          "2006–07",
+          "2008–09",
+          "2009–10",
+          "2010–11",
+          "2013–14",
+          "2014–15",
+          "2015–16",
+          "2016–17",
+          "2017–18",
+          "2018–19",
+          "2019–20",
+          "2020–21",
+          "2021–22",
+          "2022–23",
+          "2023–24",
+          "2024–25"
+        ]
+      }
+    }
+  ],
+  "spacing": 40,
+  "hconcat": [
+    {
+      "width": 470,
+      "height": 420,
+      "title": {
+        "text": {"expr": "'Share of waste recovered, ' + replace(Year_selection, '-', '–')"},
+        "anchor": "start",
+        "fontSize": 14
+      },
+      "projection": {"type": "conicEqualArea", "parallels": [-18, -36], "rotate": [-133, 0]},
+      "layer": [
+        {
+          "description": "Load the CSV first, keep the chosen year, then attach each state's shape from the TopoJSON (as in the Week 10 house-price map)",
+          "data": {
+            "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/state_rate.csv",
+            "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number", "generated_mt": "number"}}
+          },
+          "transform": [
+            {"filter": "datum.Year == Year_selection"},
+            {
+              "lookup": "state",
+              "from": {
+                "data": {
+                  "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/au_states.topojson",
+                  "format": {"type": "topojson", "feature": "states"}
+                },
+                "key": "properties.name"
+              },
+              "as": "geo"
+            }
+          ],
+          "params": [
+            {
+              "name": "state_pick",
+              "value": [{"abbr": "Vic"}],
+              "select": {"type": "point", "fields": ["abbr"], "on": "click", "clear": "dblclick"}
+            }
+          ],
+          "mark": {"type": "geoshape", "cursor": "pointer"},
+          "encoding": {
+            "shape": {"field": "geo", "type": "geojson"},
+            "color": {
+              "field": "rate",
+              "type": "quantitative",
+              "title": "Share recovered",
+              "scale": {
+                "type": "threshold",
+                "domain": [25, 40, 55, 70, 80],
+                "range": ["#fbe3d6", "#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"]
+              },
+              "legend": {
+                "orient": "none",
+                "legendX": 0,
+                "legendY": 395,
+                "direction": "horizontal",
+                "titleOrient": "top",
+                "labelOverlap": false,
+                "labelExpr": "isValid(datum.label) ? datum.label + '%' : ''"
+              }
+            },
+            "stroke": {"condition": {"param": "state_pick", "empty": false, "value": "#111"}, "value": "white"},
+            "strokeWidth": {"condition": {"param": "state_pick", "empty": false, "value": 2.5}, "value": 1},
+            "tooltip": [
+              {"field": "state", "type": "nominal", "title": "State"},
+              {"field": "Year", "type": "nominal", "title": "Financial year"},
+              {"field": "rate", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"},
+              {
+                "field": "generated_mt",
+                "type": "quantitative",
+                "title": "Waste generated (million tonnes)",
+                "format": ".1f"
+              }
+            ]
+          }
+        },
+        {
+          "description": "State labels: abbreviation and rate, placed at hand-picked label points (ACT is labelled out at sea)",
+          "data": {
+            "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/state_rate.csv",
+            "format": {"type": "csv", "parse": {"rate": "number"}}
+          },
+          "transform": [
+            {"filter": "datum.Year == Year_selection"},
+            {
+              "lookup": "abbr",
+              "from": {
+                "data": {
+                  "values": [
+                    {"abbr": "WA", "lon": 122, "lat": -26},
+                    {"abbr": "NT", "lon": 133.4, "lat": -20},
+                    {"abbr": "SA", "lon": 135, "lat": -30},
+                    {"abbr": "Qld", "lon": 144.5, "lat": -23},
+                    {"abbr": "NSW", "lon": 146.3, "lat": -32.3},
+                    {"abbr": "Vic", "lon": 144, "lat": -36.9},
+                    {"abbr": "Tas", "lon": 146.7, "lat": -42.1},
+                    {"abbr": "ACT", "lon": 153.3, "lat": -35.6}
+                  ]
+                },
+                "key": "abbr",
+                "fields": ["lon", "lat"]
+              }
+            },
+            {"calculate": "[datum.abbr, format(datum.rate, '.0f') + '%']", "as": "label"}
+          ],
+          "mark": {"type": "text", "fontSize": 12, "fontWeight": 700, "lineHeight": 14},
+          "encoding": {
+            "longitude": {"field": "lon", "type": "quantitative"},
+            "latitude": {"field": "lat", "type": "quantitative"},
+            "text": {"field": "label"},
+            "color": {
+              "condition": {"test": "datum.rate >= 70 && datum.abbr != 'ACT'", "value": "white"},
+              "value": "#222"
+            }
+          }
+        },
+        {
+          "description": "Leader line from Canberra to the ACT label, which sits out at sea because the territory is too small to label",
+          "data": {"values": [{"lon": 149.1, "lat": -35.3, "lon2": 152.1, "lat2": -35.5}]},
+          "mark": {"type": "rule", "color": "#555", "strokeWidth": 0.8},
+          "encoding": {
+            "longitude": {"field": "lon", "type": "quantitative"},
+            "latitude": {"field": "lat", "type": "quantitative"},
+            "longitude2": {"field": "lon2"},
+            "latitude2": {"field": "lat2"}
+          }
+        }
+      ]
+    },
+    {
+      "width": 400,
+      "height": 380,
+      "title": {"text": "Every state over time (click a state on the map)", "anchor": "start", "fontSize": 14},
+      "layer": [
+        {
+          "data": {"values": [{"target": 80, "fy_end": 2006.5, "end": 2025.5}]},
+          "mark": {"type": "rule", "color": "#1b4332", "strokeDash": [6, 4], "strokeWidth": 1.5},
+          "encoding": {
+            "x": {
+              "field": "fy_end",
+              "type": "quantitative",
+              "scale": {"domain": [2006.5, 2025.5], "zero": false}
+            },
+            "x2": {"field": "end"},
+            "y": {"field": "target", "type": "quantitative"}
+          }
+        },
+        {
+          "data": {"values": [{"target": 80, "fy_end": 2007, "label": "Target 80%"}]},
+          "mark": {
+            "type": "text",
+            "align": "left",
+            "dy": -8,
+            "fontSize": 11.5,
+            "fontWeight": 600,
+            "color": "#1b4332"
+          },
+          "encoding": {
+            "x": {
+              "field": "fy_end",
+              "type": "quantitative",
+              "scale": {"domain": [2006.5, 2025.5], "zero": false}
+            },
+            "y": {"field": "target", "type": "quantitative"},
+            "text": {"field": "label"}
+          }
+        },
+        {
+          "description": "Vertical marker for the year shown on the map",
+          "data": {"values": [{}]},
+          "transform": [{"calculate": "toNumber(substring(Year_selection, 0, 4)) + 1", "as": "fy_end"}],
+          "mark": {"type": "rule", "color": "#999", "strokeWidth": 1},
+          "encoding": {
+            "x": {
+              "field": "fy_end",
+              "type": "quantitative",
+              "scale": {"domain": [2006.5, 2025.5], "zero": false}
+            }
+          }
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/state_rate.csv",
+            "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number"}}
+          },
+          "layer": [
+            {
+              "mark": {"type": "line", "interpolate": "linear"},
+              "encoding": {
+                "x": {
+                  "field": "fy_end",
+                  "type": "quantitative",
+                  "title": null,
+                  "scale": {"domain": [2006.5, 2025.5], "zero": false},
+                  "axis": {
+                    "values": [2007, 2013, 2019, 2025],
+                    "grid": false,
+                    "labelExpr": "(datum.value - 1) + '–' + substring(toString(datum.value), 2, 4)"
+                  }
+                },
+                "y": {
+                  "field": "rate",
+                  "type": "quantitative",
+                  "title": "Share of waste recovered (%)",
+                  "scale": {"domain": [0, 100]}
+                },
+                "detail": {"field": "abbr"},
+                "color": {
+                  "condition": {"param": "state_pick", "empty": false, "value": "#1b4332"},
+                  "value": "#cfcfcf"
+                },
+                "strokeWidth": {"condition": {"param": "state_pick", "empty": false, "value": 3}, "value": 1.2},
+                "order": {"condition": {"param": "state_pick", "empty": false, "value": 1}, "value": 0},
+                "tooltip": [
+                  {"field": "state", "type": "nominal", "title": "State"},
+                  {"field": "Year", "type": "nominal", "title": "Financial year"},
+                  {"field": "rate", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"}
+                ]
+              }
+            },
+            {
+              "description": "Label the highlighted state's line at its latest value",
+              "transform": [
+                {"filter": {"param": "state_pick", "empty": false}},
+                {"filter": "datum.fy_end == 2025"},
+                {"calculate": "datum.abbr + ' ' + format(datum.rate, '.0f') + '%'", "as": "label"}
+              ],
+              "mark": {
+                "type": "text",
+                "align": "left",
+                "dx": 6,
+                "fontSize": 12,
+                "fontWeight": 700,
+                "color": "#1b4332"
+              },
+              "encoding": {
+                "x": {
+                  "field": "fy_end",
+                  "type": "quantitative",
+                  "scale": {"domain": [2006.5, 2025.5], "zero": false}
+                },
+                "y": {"field": "rate", "type": "quantitative"},
+                "text": {"field": "label"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    },
+    "legend": {"labelFontSize": 12, "titleFontSize": 12, "titleFontWeight": 600},
+    "title": {"font": "'Source Sans 3', sans-serif", "fontWeight": 700, "color": "#222"}
+  }
+}

@@ -1,0 +1,222 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Symbol map of recycling and landfill sites (2022 infrastructure database) with a count of facilities per state. Dropdowns filter the facility type and zoom the map to a state; a checkbox hides landfills.",
+  "params": [
+    {
+      "name": "Type_selection",
+      "value": "All recycling",
+      "bind": {
+        "input": "select",
+        "name": "Show: ",
+        "options": ["All recycling", "Sorting (MRF)", "Paper & cardboard", "Plastics", "Glass", "Metals"],
+        "labels": [
+          "All recycling facilities",
+          "Sorting centres (MRFs)",
+          "Paper & cardboard recyclers",
+          "Plastics reprocessors",
+          "Glass reprocessors",
+          "Metals recyclers"
+        ]
+      }
+    },
+    {
+      "name": "Show_landfills",
+      "value": true,
+      "bind": {"input": "checkbox", "name": "Also show landfills "}
+    },
+    {
+      "name": "Zoom_to",
+      "value": [133.5, -28.2, 700],
+      "description": "[centre longitude, centre latitude, map scale]",
+      "bind": {
+        "input": "select",
+        "name": "Zoom to: ",
+        "options": [
+          [133.5, -28.2, 700],
+          [145, -36.8, 3100],
+          [147, -32.8, 2150],
+          [145, -19.5, 1340],
+          [121, -25, 1030],
+          [135, -32, 1870],
+          [146.5, -42, 6800],
+          [133.5, -19, 1650]
+        ],
+        "labels": [
+          "All of Australia",
+          "Victoria",
+          "New South Wales & ACT",
+          "Queensland",
+          "Western Australia",
+          "South Australia",
+          "Tasmania",
+          "Northern Territory"
+        ]
+      }
+    }
+  ],
+  "spacing": 30,
+  "hconcat": [
+    {
+      "width": 560,
+      "height": 500,
+      "projection": {
+        "type": "mercator",
+        "center": {"expr": "[Zoom_to[0], Zoom_to[1]]"},
+        "scale": {"expr": "Zoom_to[2]"},
+        "translate": [280, 250]
+      },
+      "layer": [
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/au_states_detail.topojson",
+            "format": {"type": "topojson", "feature": "states"}
+          },
+          "mark": {"type": "geoshape", "fill": "#f1efea", "stroke": "#c9c3b8", "strokeWidth": 0.8, "clip": true}
+        },
+        {
+          "data": {
+            "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/facilities_2022.csv",
+            "format": {"type": "csv", "parse": {"lat": "number", "lon": "number"}}
+          },
+          "layer": [
+            {
+              "description": "Landfills drawn first, small and grey, so recycling sites sit on top",
+              "transform": [{"filter": "Show_landfills && datum.type == 'Landfill'"}],
+              "mark": {
+                "type": "point",
+                "shape": "triangle-up",
+                "size": 22,
+                "filled": true,
+                "color": "#9a9a9a",
+                "opacity": 0.55,
+                "clip": true
+              },
+              "encoding": {
+                "longitude": {"field": "lon", "type": "quantitative"},
+                "latitude": {"field": "lat", "type": "quantitative"},
+                "tooltip": [
+                  {"field": "name", "type": "nominal", "title": "Site"},
+                  {"field": "detail", "type": "nominal", "title": "Type"},
+                  {"field": "suburb", "type": "nominal", "title": "Location"},
+                  {"field": "state", "type": "nominal", "title": "State"}
+                ]
+              }
+            },
+            {
+              "transform": [
+                {
+                  "filter": "datum.type != 'Landfill' && (Type_selection == 'All recycling' || datum.type == Type_selection)"
+                }
+              ],
+              "mark": {
+                "type": "circle",
+                "size": 46,
+                "opacity": 0.85,
+                "stroke": "white",
+                "strokeWidth": 0.6,
+                "clip": true
+              },
+              "encoding": {
+                "longitude": {"field": "lon", "type": "quantitative"},
+                "latitude": {"field": "lat", "type": "quantitative"},
+                "color": {
+                  "field": "type",
+                  "type": "nominal",
+                  "title": null,
+                  "scale": {
+                    "domain": ["Sorting (MRF)", "Paper & cardboard", "Plastics", "Glass", "Metals"],
+                    "range": ["#264653", "#b5833a", "#d1495b", "#2a9d8f", "#577590"]
+                  },
+                  "legend": {
+                    "orient": "none",
+                    "legendX": 0,
+                    "legendY": 400,
+                    "symbolType": "circle",
+                    "symbolSize": 90,
+                    "labelFontSize": 12
+                  }
+                },
+                "tooltip": [
+                  {"field": "name", "type": "nominal", "title": "Site"},
+                  {"field": "detail", "type": "nominal", "title": "Type"},
+                  {"field": "suburb", "type": "nominal", "title": "Location"},
+                  {"field": "state", "type": "nominal", "title": "State"}
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "width": 260,
+      "height": 270,
+      "title": {
+        "text": {
+          "expr": "(Type_selection == 'All recycling' ? 'Recycling' : Type_selection) + (Show_landfills ? ' sites vs landfills' : ' sites') + ', by state'"
+        },
+        "anchor": "start",
+        "fontSize": 13.5
+      },
+      "data": {
+        "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/facilities_2022.csv"
+      },
+      "transform": [
+        {
+          "filter": "(datum.type != 'Landfill' && (Type_selection == 'All recycling' || datum.type == Type_selection)) || (Show_landfills && datum.type == 'Landfill')"
+        },
+        {"calculate": "datum.type == 'Landfill' ? 'Landfill' : 'Recycling'", "as": "kind"}
+      ],
+      "mark": {"type": "bar", "cornerRadiusEnd": 2},
+      "encoding": {
+        "y": {
+          "field": "state",
+          "type": "nominal",
+          "title": null,
+          "sort": ["NSW", "VIC", "QLD", "WA", "SA", "TAS", "ACT", "NT"],
+          "axis": {
+            "labelExpr": "datum.label == 'VIC' ? 'Vic' : datum.label == 'QLD' ? 'Qld' : datum.label == 'TAS' ? 'Tas' : datum.label",
+            "domain": false,
+            "ticks": false
+          }
+        },
+        "x": {
+          "aggregate": "count",
+          "type": "quantitative",
+          "title": "Number of sites",
+          "axis": {"tickCount": 4}
+        },
+        "yOffset": {"field": "kind", "type": "nominal", "sort": ["Recycling", "Landfill"]},
+        "color": {
+          "field": "kind",
+          "type": "nominal",
+          "title": null,
+          "scale": {"domain": ["Recycling", "Landfill"], "range": ["#2d6a4f", "#bdbdbd"]},
+          "legend": {"orient": "bottom", "direction": "horizontal"}
+        },
+        "tooltip": [
+          {"field": "state", "type": "nominal", "title": "State"},
+          {"field": "kind", "type": "nominal", "title": "Kind"},
+          {"aggregate": "count", "type": "quantitative", "title": "Sites"}
+        ]
+      }
+    }
+  ],
+  "resolve": {"scale": {"color": "independent"}, "legend": {"color": "independent"}},
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    },
+    "legend": {"labelFontSize": 12},
+    "title": {"font": "'Source Sans 3', sans-serif", "fontWeight": 700, "color": "#222"}
+  }
+}

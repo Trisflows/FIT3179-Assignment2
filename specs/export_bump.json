@@ -1,0 +1,112 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Bump chart: rank of each country by tonnes of Australian waste and recovered materials received, per financial year. Only countries that reached the top 6 in at least one year are shown.",
+  "width": "container",
+  "height": 300,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "padding": {"right": 130, "left": 5, "top": 10, "bottom": 5},
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv",
+    "format": {"type": "csv", "parse": {"Tonnes": "number"}}
+  },
+  "transform": [
+    {
+      "aggregate": [{"op": "sum", "field": "Tonnes", "as": "tonnes"}],
+      "groupby": ["Financial Year", "Destination"]
+    },
+    {
+      "window": [{"op": "row_number", "as": "rank"}],
+      "groupby": ["Financial Year"],
+      "sort": [{"field": "tonnes", "order": "descending"}]
+    },
+    {"joinaggregate": [{"op": "min", "field": "rank", "as": "best_rank"}], "groupby": ["Destination"]},
+    {"filter": "datum.best_rank <= 6"},
+    {"filter": "datum.rank <= 9"},
+    {
+      "calculate": "datum.Destination == 'Korea, Republic of' ? 'South Korea' : datum.Destination",
+      "as": "country"
+    },
+    {
+      "calculate": "datum.country == 'China' ? 'China' : datum.country == 'Indonesia' ? 'Indonesia' : datum.country == 'Bangladesh' ? 'Bangladesh' : 'Other'",
+      "as": "highlight"
+    }
+  ],
+  "encoding": {
+    "x": {
+      "field": "Financial Year",
+      "type": "ordinal",
+      "title": null,
+      "scale": {"padding": 0.3},
+      "axis": {
+        "labelAngle": 0,
+        "orient": "top",
+        "domain": false,
+        "ticks": false,
+        "labelExpr": "replace(datum.label, '-', '–')"
+      }
+    },
+    "y": {
+      "field": "rank",
+      "type": "ordinal",
+      "title": "Rank by tonnes received",
+      "scale": {"domain": [1, 2, 3, 4, 5, 6, 7, 8, 9]},
+      "axis": {"domain": false, "ticks": false, "grid": false, "labelExpr": "'#' + datum.label"}
+    },
+    "color": {
+      "field": "highlight",
+      "type": "nominal",
+      "legend": null,
+      "scale": {
+        "domain": ["China", "Indonesia", "Bangladesh", "Other"],
+        "range": ["#c0392b", "#2d6a4f", "#e09f3e", "#c4c4c4"]
+      }
+    },
+    "opacity": {"condition": {"param": "country_hover", "empty": true, "value": 1}, "value": 0.25}
+  },
+  "layer": [
+    {
+      "mark": {"type": "line", "strokeWidth": 3, "interpolate": "linear"},
+      "encoding": {"detail": {"field": "country"}}
+    },
+    {
+      "params": [
+        {
+          "name": "country_hover",
+          "select": {"type": "point", "fields": ["Destination"], "on": "pointerover", "clear": "pointerout"}
+        }
+      ],
+      "mark": {"type": "circle", "size": 120, "opacity": 1, "cursor": "pointer"},
+      "encoding": {
+        "tooltip": [
+          {"field": "country", "type": "nominal", "title": "Country"},
+          {"field": "Financial Year", "type": "nominal", "title": "Financial year"},
+          {"field": "rank", "type": "ordinal", "title": "Rank"},
+          {"field": "tonnes", "type": "quantitative", "title": "Tonnes received", "format": ",.0f"}
+        ]
+      }
+    },
+    {
+      "description": "Country names at the right-hand end of each line",
+      "transform": [{"filter": "datum['Financial Year'] == '2025-26'"}],
+      "mark": {"type": "text", "align": "left", "dx": 12, "fontSize": 12.5, "fontWeight": 600},
+      "encoding": {"text": {"field": "country"}}
+    },
+    {
+      "description": "Label China at its starting position too, since its fall is the story",
+      "transform": [{"filter": "datum['Financial Year'] == '2017-18' && datum.country == 'China'"}],
+      "mark": {"type": "text", "align": "left", "dx": 10, "dy": -12, "fontSize": 12.5, "fontWeight": 700},
+      "encoding": {"text": {"value": "China was #1"}}
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333"
+    }
+  }
+}

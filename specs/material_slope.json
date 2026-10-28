@@ -1,0 +1,117 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Slope chart: recovery rate of each material in 2018-19 (the year before the 80% target was set) versus 2024-25.",
+  "width": 300,
+  "height": 380,
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/material_rate.csv",
+    "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number", "generated_mt": "number"}}
+  },
+  "transform": [
+    {"filter": {"field": "Year", "oneOf": ["2018-19", "2024-25"]}},
+    {
+      "window": [
+        {"op": "first_value", "field": "rate", "as": "start"},
+        {"op": "last_value", "field": "rate", "as": "end"}
+      ],
+      "groupby": ["material"],
+      "sort": [{"field": "fy_end"}],
+      "frame": [null, null]
+    },
+    {"calculate": "datum.end - datum.start", "as": "change"},
+    {
+      "calculate": "datum.change <= -2 ? 'Went backwards' : datum.change >= 2 ? 'Improved' : 'Little change (±2 points)'",
+      "as": "direction"
+    },
+    {
+      "description": "Small manual nudges so labels for near-identical values do not overlap",
+      "calculate": "datum.Year == '2024-25' ? (datum.material == 'Paper & cardboard' ? 2.2 : datum.material == 'Glass' ? -2.2 : datum.material == 'Plastics' ? 2.2 : datum.material == 'Textiles & rubber' ? -2.2 : datum.material == 'Metals' ? 1.5 : datum.material == 'Building rubble' ? -1.5 : 0) : (datum.material == 'Plastics' ? 1.5 : datum.material == 'Textiles & rubber' ? -1.5 : 0)",
+      "as": "nudge"
+    },
+    {"calculate": "datum.rate + datum.nudge", "as": "label_y"}
+  ],
+  "encoding": {
+    "x": {
+      "field": "Year",
+      "type": "ordinal",
+      "title": null,
+      "scale": {"padding": 0.15},
+      "axis": {
+        "orient": "top",
+        "labelAngle": 0,
+        "labelFontSize": 13,
+        "labelFontWeight": 700,
+        "domain": false,
+        "ticks": false,
+        "labelExpr": "datum.label == '2018-19' ? '2018–19' : '2024–25'"
+      }
+    }
+  },
+  "layer": [
+    {
+      "mark": {"type": "line", "strokeWidth": 2.5},
+      "encoding": {
+        "y": {"field": "rate", "type": "quantitative", "scale": {"domain": [0, 100]}, "axis": null},
+        "detail": {"field": "material"},
+        "color": {
+          "field": "direction",
+          "type": "nominal",
+          "title": null,
+          "scale": {
+            "domain": ["Improved", "Little change (±2 points)", "Went backwards"],
+            "range": ["#2d6a4f", "#b9b9b9", "#c0392b"]
+          },
+          "legend": {"orient": "bottom", "direction": "horizontal", "symbolType": "stroke", "symbolStrokeWidth": 3}
+        }
+      }
+    },
+    {
+      "mark": {"type": "circle", "size": 55, "opacity": 1},
+      "encoding": {
+        "y": {"field": "rate", "type": "quantitative"},
+        "color": {"field": "direction", "type": "nominal"},
+        "tooltip": [
+          {"field": "material", "type": "nominal", "title": "Material"},
+          {"field": "Year", "type": "nominal", "title": "Financial year"},
+          {"field": "rate", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"},
+          {
+            "field": "change",
+            "type": "quantitative",
+            "title": "Change since 2018–19 (points)",
+            "format": "+.1f"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Left-hand labels: value only",
+      "transform": [{"filter": "datum.Year == '2018-19'"}],
+      "mark": {"type": "text", "align": "right", "dx": -10, "fontSize": 12},
+      "encoding": {
+        "y": {"field": "label_y", "type": "quantitative"},
+        "text": {"field": "rate", "type": "quantitative", "format": ".0f"},
+        "color": {"field": "direction", "type": "nominal"}
+      }
+    },
+    {
+      "description": "Right-hand labels: value and material name",
+      "transform": [
+        {"filter": "datum.Year == '2024-25'"},
+        {"calculate": "format(datum.rate, '.0f') + '%  ' + datum.material", "as": "label"}
+      ],
+      "mark": {"type": "text", "align": "left", "dx": 10, "fontSize": 12, "fontWeight": 600},
+      "encoding": {
+        "y": {"field": "label_y", "type": "quantitative"},
+        "text": {"field": "label"},
+        "color": {"field": "direction", "type": "nominal"}
+      }
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {"labelColor": "#333"},
+    "legend": {"labelFontSize": 12}
+  },
+  "padding": {"left": 10, "right": 170, "top": 5, "bottom": 5}
+}

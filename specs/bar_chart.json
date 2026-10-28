@@ -1,0 +1,102 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container",
+  "height": 230,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "params": [{"name": "Year_selection", "value": "2025-26"}, {"name": "Material_selection", "value": null}],
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv",
+    "format": {"type": "csv", "parse": {"Tonnes": "number"}}
+  },
+  "transform": [
+    {"filter": "isValid(datum['Material group']) && datum['Material group'] != 'NA'"},
+    {"filter": "datum['Financial Year'] == Year_selection"},
+    {"filter": "Material_selection == null || datum['Material group'] == Material_selection"},
+    {
+      "calculate": "indexof(['Metals', 'Paper & cardboard', 'Tyres', 'Non-core waste', 'Textiles', 'Hazardous (excl. tyres)', 'Plastics', 'Glass', 'Other core waste'], datum['Material group'])",
+      "as": "stack_order"
+    }
+  ],
+  "mark": {"type": "bar", "cornerRadiusEnd": 4},
+  "encoding": {
+    "x": {
+      "field": "Tonnes",
+      "aggregate": "sum",
+      "type": "quantitative",
+      "title": "Tonnes exported (millions)",
+      "axis": {"labelExpr": "format(datum.value / 1e6, '.1f')", "tickCount": 6}
+    },
+    "y": {
+      "field": "State of origin",
+      "type": "nominal",
+      "title": null,
+      "sort": "-x",
+      "axis": {"domain": false, "ticks": false, "labelFontSize": 12.5, "labelFontWeight": 600}
+    },
+    "color": {
+      "field": "Material group",
+      "type": "nominal",
+      "title": null,
+      "scale": {
+        "domain": [
+          "Metals",
+          "Paper & cardboard",
+          "Tyres",
+          "Non-core waste",
+          "Textiles",
+          "Hazardous (excl. tyres)",
+          "Plastics",
+          "Glass",
+          "Other core waste"
+        ],
+        "range": [
+          "#577590",
+          "#b5833a",
+          "#3d3d3d",
+          "#a8a8a8",
+          "#e9a23b",
+          "#7d5ba6",
+          "#d1495b",
+          "#2a9d8f",
+          "#d6d6d6"
+        ]
+      },
+      "legend": {
+        "orient": "bottom",
+        "direction": "horizontal",
+        "columns": 5,
+        "symbolType": "square",
+        "columnPadding": 14
+      }
+    },
+    "tooltip": [
+      {"field": "State of origin", "type": "nominal", "title": "Origin State"},
+      {"field": "Material group", "type": "nominal"},
+      {
+        "field": "Tonnes",
+        "aggregate": "sum",
+        "type": "quantitative",
+        "format": ",.0f",
+        "title": "Total Tonnes"
+      }
+    ],
+    "order": {"field": "stack_order", "type": "quantitative", "sort": "ascending"}
+  },
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    },
+    "legend": {"labelFontSize": 12, "titleFontSize": 12, "titleFontWeight": 600}
+  },
+  "description": "Stacked bar chart: tonnes exported from each state, split by material. Driven by the same year/material dropdowns as the flow map.",
+  "padding": {"left": 5, "right": 20, "top": 5, "bottom": 5}
+}

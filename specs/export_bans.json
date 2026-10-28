@@ -1,0 +1,207 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Small multiples: Australia's exports of the four materials covered by the waste export regulations, with the date each rule started. Each panel has its own y-axis because volumes differ by 100x.",
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv",
+    "format": {"type": "csv", "parse": {"Tonnes": "number"}}
+  },
+  "transform": [
+    {
+      "filter": {"field": "Material group", "oneOf": ["Plastics", "Glass", "Tyres", "Paper & cardboard"]}
+    },
+    {
+      "aggregate": [{"op": "sum", "field": "Tonnes", "as": "tonnes"}],
+      "groupby": ["Financial Year", "Material group"]
+    },
+    {"calculate": "toNumber(substring(datum['Financial Year'], 0, 4)) + 1", "as": "fy_end"},
+    {
+      "description": "Plot each financial year at its last day (30 June)",
+      "calculate": "datetime(datum.fy_end, 5, 30)",
+      "as": "date"
+    },
+    {"calculate": "datum.tonnes / 1000", "as": "kt"},
+    {
+      "lookup": "Material group",
+      "from": {
+        "data": {
+          "values": [
+            {
+              "Material group": "Plastics",
+              "panel": "Plastics",
+              "ban1": "2021-07-01",
+              "ban1_label": "Mixed plastics banned (Jul 2021)",
+              "ban2": "2022-07-01",
+              "ban2_label": "Single-type plastics (Jul 2022)",
+              "note": "Down 90% since 2017–18"
+            },
+            {
+              "Material group": "Glass",
+              "panel": "Glass",
+              "ban1": "2021-01-01",
+              "ban1_label": "Glass banned (Jan 2021)",
+              "note": "Near zero since the ban; small licensed exports"
+            },
+            {
+              "Material group": "Tyres",
+              "panel": "Tyres",
+              "ban1": "2021-12-01",
+              "ban1_label": "Whole tyres banned (Dec 2021)",
+              "note": "Processed tyres, still allowed, more than tripled"
+            },
+            {
+              "Material group": "Paper & cardboard",
+              "panel": "Paper & cardboard",
+              "ban1": "2024-07-01",
+              "ban1_label": "Mixed paper banned (Jul 2024)",
+              "note": "Sorted paper can still be exported"
+            }
+          ]
+        },
+        "key": "Material group",
+        "fields": ["panel", "ban1", "ban1_label", "ban2", "ban2_label", "note"]
+      }
+    },
+    {"calculate": "toDate(datum.ban1)", "as": "ban1_date"},
+    {"calculate": "isValid(datum.ban2) ? toDate(datum.ban2) : null", "as": "ban2_date"}
+  ],
+  "facet": {
+    "field": "panel",
+    "type": "nominal",
+    "title": null,
+    "sort": ["Plastics", "Glass", "Tyres", "Paper & cardboard"],
+    "header": {
+      "labelFontSize": 14,
+      "labelFontWeight": 700,
+      "labelAnchor": "start",
+      "labelColor": "#222",
+      "labelPadding": 6
+    }
+  },
+  "columns": 2,
+  "spacing": {"row": 30, "column": 40},
+  "resolve": {"scale": {"y": "independent"}},
+  "spec": {
+    "width": 400,
+    "height": 140,
+    "layer": [
+      {
+        "mark": {"type": "area", "opacity": 0.18, "interpolate": "linear"},
+        "encoding": {
+          "x": {
+            "field": "date",
+            "type": "temporal",
+            "title": null,
+            "axis": {"format": "%Y", "tickCount": 5, "grid": false}
+          },
+          "y": {
+            "field": "kt",
+            "type": "quantitative",
+            "title": "Thousand tonnes",
+            "axis": {"tickCount": 3},
+            "scale": {"zero": true}
+          },
+          "color": {
+            "field": "Material group",
+            "type": "nominal",
+            "legend": null,
+            "scale": {
+              "domain": ["Plastics", "Glass", "Tyres", "Paper & cardboard"],
+              "range": ["#d1495b", "#2a9d8f", "#3d3d3d", "#b5833a"]
+            }
+          }
+        }
+      },
+      {
+        "mark": {"type": "line", "strokeWidth": 2.5, "point": {"filled": true, "size": 30}},
+        "encoding": {
+          "x": {"field": "date", "type": "temporal"},
+          "y": {"field": "kt", "type": "quantitative"},
+          "color": {"field": "Material group", "type": "nominal", "legend": null},
+          "tooltip": [
+            {"field": "Material group", "type": "nominal", "title": "Material"},
+            {"field": "Financial Year", "type": "nominal", "title": "Financial year"},
+            {"field": "tonnes", "type": "quantitative", "title": "Exported (tonnes)", "format": ",.0f"}
+          ]
+        }
+      },
+      {
+        "description": "One row per panel for the annotations",
+        "transform": [{"filter": "datum['Financial Year'] == '2017-18'"}],
+        "layer": [
+          {
+            "mark": {"type": "rule", "color": "#555", "strokeDash": [4, 3]},
+            "encoding": {"x": {"field": "ban1_date", "type": "temporal"}}
+          },
+          {
+            "mark": {
+              "type": "text",
+              "align": "left",
+              "baseline": "top",
+              "dx": 4,
+              "dy": 2,
+              "fontSize": 11,
+              "color": "#555"
+            },
+            "encoding": {
+              "x": {"field": "ban1_date", "type": "temporal"},
+              "y": {"value": 0},
+              "text": {"field": "ban1_label"}
+            }
+          },
+          {
+            "transform": [{"filter": "isValid(datum.ban2_date)"}],
+            "mark": {"type": "rule", "color": "#555", "strokeDash": [2, 3]},
+            "encoding": {"x": {"field": "ban2_date", "type": "temporal"}}
+          },
+          {
+            "transform": [{"filter": "isValid(datum.ban2_date)"}],
+            "mark": {
+              "type": "text",
+              "align": "left",
+              "baseline": "top",
+              "dx": 4,
+              "dy": 16,
+              "fontSize": 11,
+              "color": "#555"
+            },
+            "encoding": {
+              "x": {"field": "ban2_date", "type": "temporal"},
+              "y": {"value": 0},
+              "text": {"field": "ban2_label"}
+            }
+          },
+          {
+            "mark": {
+              "type": "text",
+              "align": "right",
+              "baseline": "bottom",
+              "dy": -6,
+              "fontSize": 12,
+              "fontWeight": 700
+            },
+            "encoding": {
+              "x": {"datum": {"year": 2026, "month": 6, "date": 30}, "type": "temporal"},
+              "y": {"value": 0},
+              "text": {"field": "note"},
+              "color": {"field": "Material group", "type": "nominal", "legend": null}
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 11.5,
+      "titleFontSize": 11.5,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    }
+  }
+}

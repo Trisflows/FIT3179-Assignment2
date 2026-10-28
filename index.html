@@ -1,155 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Is Australia actually getting better at recycling?</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
-    
-    <!-- Vega & Vega-Lite JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Tristan Wen Ern Tan">
+  <title>Is Australia actually getting better at recycling?</title>
 
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #212529;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        h1, h2 {
-            color: #1b4332;
-        }
-        h1 {
-            font-size: 60px;
-        }
-        .chart-card {
-            background: #fafafa;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 25px;
-        }
-        .vis-container {
-            width: 100%;
-        }
-    </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div class="container">
-    <h1>Recycling & Waste Management: <br> How has Australia been improving?</h1>
-    <p><strong>Author:</strong> Tristan Wen Ern Tan 34077049 | <strong>Date:</strong> 27 October 2026</p>
-    <p>Australia targets an ambitious 80% average resource recovery rate by 2030. This visualisation explores our national progress.</p>
-    <hr>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Recycling &amp; waste in Australia · 2006–07 to 2025–26</p>
+    <h1>Is Australia actually getting better at recycling?</h1>
+    <p class="standfirst">
+      In 2019 every Australian government signed up to a goal: by 2030, recover 80% of all the waste
+      we throw away. Six years on, we are recovering more than ever. But the headline number hides
+      which materials are doing the work, which states are falling behind, and where the rest of our
+      recycling actually goes.
+    </p>
+    <p class="byline">By <strong>Tristan Wen Ern Tan</strong> (34077049) · FIT3179 Data Visualisation 2 · 28 October 2026</p>
 
-    <!-- SECTION 1 -->
-    <h2>Global & National Overview</h2>
-    <!-- FILTER CONTROLS -->
-    <div style="margin-bottom: 20px; display: flex; gap: 20px; align-items: center;">
-        <label>
-            <strong>Financial Year:</strong>
-            <select id="yearSelect">
-                <option value="2017-18">2017-18</option>
-                <option value="2018-19">2018-19</option>
-                <option value="2019-20">2019-20</option>
-                <option value="2020-21">2020-21</option>
-                <option value="2021-22">2021-22</option>
-                <option value="2022-23">2022-23</option>
-                <option value="2023-24" selected>2023-24</option>
-                <option value="2024-25">2024-25</option>
-            </select>
-        </label>
-
-        <label>
-            <strong>Material Group:</strong>
-            <select id="materialSelect">
-            <option value="ALL">Show All</option>
-                <option value="Glass">Glass</option>
-                <option value="Plastics">Plastics</option>
-                <option value="Paper & cardboard">Paper & cardboard</option>
-                <option value="Metals">Metals</option>
-                <option value="Textiles">Textiles</option>
-                <option value="Tyres">Tyres</option>
-                <option value="Hazardous (excl. tyres)">Hazardous (excl. tyres)</option>
-                <option value="Non-core waste">Non-core waste</option>
-                <option value="Other core waste">Other core waste</option>
-            </select>
-        </label>
+    <div class="pure-g stats">
+      <div class="pure-u-1-2 pure-u-md-1-4"><div class="stat"><span class="num">67.5%</span><span class="lbl">of Australia's waste was recovered in 2024–25</span></div></div>
+      <div class="pure-u-1-2 pure-u-md-1-4"><div class="stat"><span class="num">80%</span><span class="lbl">is the national target for 2030</span></div></div>
+      <div class="pure-u-1-2 pure-u-md-1-4"><div class="stat"><span class="num">79&nbsp;Mt</span><span class="lbl">of waste generated in 2024–25 (million tonnes)</span></div></div>
+      <div class="pure-u-1-2 pure-u-md-1-4"><div class="stat warn"><span class="num">12%</span><span class="lbl">of plastic waste is recycled. The rest is mostly landfilled.</span></div></div>
     </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <aside class="definition">
+    <h4>What does “recovered” mean?</h4>
+    <p>Waste is <strong>recovered</strong> when it is recycled, reused, or burned to make energy instead of being buried in landfill.
+       The <strong>recovery rate</strong> is the share of all waste generated that was recovered. It includes household bins,
+       business waste and building rubble.</p>
+  </aside>
+
+  <!-- ===================== SECTION 1 ===================== -->
+  <section id="s1">
+    <p class="section-num">01 · The national picture</p>
+    <h2>We're improving, but not fast enough to hit 80%</h2>
     <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-2-3">
-            <div class="chart-card"><div id="flow_map" class="vis-container"></div></div>
-        </div>
-        <div class="pure-u-1 pure-u-md-1-3" style="box-sizing: border-box; padding-left: 10px;">
-            <div class="text-card">
-                <h3>Export Insights</h3>
-                <p>Throughout the years, metals remain to be the most exported recyclable waste </p>
-                <p>From 2017 to 2020, most of the recyclable waste was diverted away from China and rerouted into Southeast Asian countries like Malaysia, Thailand, Vietnam and Indonesia.</p>
-            </div>
-        </div>
-        <div id="bar_chart" class="vis-container"></div>
+      <div class="pure-u-1 pure-u-md-1-3 text-col">
+        <p>Australia recovered <strong>49%</strong> of its waste in 2006–07 and <strong>67.5%</strong> in 2024–25.
+           Since the target was set, the rate has risen by about <strong>0.8 points a year</strong>.</p>
+        <p>Extend that line to 2029–30 and we land at roughly <strong>71%</strong>, about nine points short.</p>
+        <p class="callout">The brown line is the honest one. Building rubble (concrete, bricks, soil) makes up 35% of all waste
+           and 86% of it is recovered. Take rubble out, and our recovery rate has crept up only about
+           <strong>3 points</strong> since 2018–19.</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-2-3">
+        <div class="chart-card"><div id="national_trend" class="vis-container"></div></div>
+        <p class="source">Dashed line: straight-line trend of 2018–19 to 2024–25, extended to 2029–30. It is a projection, not a forecast. Hover over points for exact values.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 2 ===================== -->
+  <section id="s2">
+    <p class="section-num">02 · Material by material</p>
+    <h2>Metal gets recycled. Plastic mostly doesn't.</h2>
+    <p class="lede">What happened to every 100 tonnes of the four materials most people put in their recycling bin, in 2024–25:</p>
+    <div class="chart-card center"><div id="material_waffle"></div></div>
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-2-3">
+        <h3>Nineteen years of recovery rates, material by material</h3>
+        <div class="chart-card"><div id="material_heatmap" class="vis-container"></div></div>
+        <p class="source">Each cell is the % recovered that year. Hover a row to focus on one material. No national data exists for 2007–08, 2011–12 and 2012–13.</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-1-3 text-col">
+        <h3>&nbsp;</h3>
+        <p><strong>Plastics</strong> have sat between 10% and 15% recovered for the entire 19 years. No other material has stayed this low for this long.</p>
+        <p><strong>Paper and cardboard</strong> are the surprise: recovery fell from 70% in 2006–07 to 55% today, with the steepest drop after 2018–19. That timing coincides with China's 2018 restrictions on imported recyclables (see section 04).</p>
+        <p><strong>Glass</strong> has also slipped, from 59% to 54% since 2018–19.</p>
+      </div>
     </div>
 
-    <!-- SECTION 2 -->
-    <h2>Section 2: Australia's Regional Recycling Performance</h2>
     <div class="pure-g">
-        <div class="pure-u-1 chart-card">
-            <div id="map2" class="vis-container"></div>
-        </div>
+      <div class="pure-u-1 pure-u-md-1-2">
+        <h3>Since the target was set: who moved?</h3>
+        <div class="chart-card center"><div id="material_slope"></div></div>
+      </div>
+      <div class="pure-u-1 pure-u-md-1-2 text-col">
+        <h3>&nbsp;</h3>
+        <p>Comparing 2018–19 (the year before the target) with 2024–25: only <strong>building rubble</strong> (+4 points) and
+           <strong>hazardous waste</strong> (+8 points) clearly improved.</p>
+        <p>Paper and cardboard went <strong>backwards by 10 points</strong>, and glass by 5.
+           These are the materials households handle every week, and they are moving the wrong way.</p>
+        <p class="callout">The national rate still rose because building rubble is so heavy: 27 million tonnes in 2024–25,
+           almost twice the weight of paper, plastics, glass and metals combined (15 million tonnes).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 3 ===================== -->
+  <section id="s3">
+    <p class="section-num">03 · State by state</p>
+    <h2>Only South Australia has reached 80%, and it's slipping</h2>
+    <p class="lede">Choose a year to recolour the map. <strong>Click a state</strong> to trace its history on the right; double-click to clear. Victoria is selected to start.</p>
+    <div class="chart-card"><div id="state_map"></div></div>
+    <p class="source">Map uses an equal-area projection so each state's size is shown fairly. The ACT is labelled offshore because it is too small to label in place.</p>
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-3 text-col">
+        <h3>Distance to the target</h3>
+        <p><strong>South Australia</strong> recovers 80% of its waste, the only state at the target. It was 85% in 2018–19.</p>
+        <p><strong>Victoria</strong> and the <strong>ACT</strong> have gone backwards since the target was set.</p>
+        <p>The <strong>Northern Territory</strong> made the biggest jump (+19 points) but is still furthest away. Remote towns there rely on landfills, with few recycling sites nearby (see section 05).</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-2-3">
+        <div class="chart-card"><div id="state_dumbbell" class="vis-container"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SECTION 4 ===================== -->
+  <section id="s4">
+    <p class="section-num">04 · Where it goes</p>
+    <h2>When China stopped taking our waste, Southeast Asia took over</h2>
+    <p class="lede">About 4.7 million tonnes of waste and recovered material left Australia in 2025–26, roughly one tonne in every seventeen we generate.
+       Pick a year and material to redraw the routes.</p>
+
+    <div class="controls">
+      <label>Financial year
+        <select id="yearSelect">
+          <option value="2017-18">2017–18</option>
+          <option value="2018-19">2018–19</option>
+          <option value="2019-20">2019–20</option>
+          <option value="2020-21">2020–21</option>
+          <option value="2021-22">2021–22</option>
+          <option value="2022-23">2022–23</option>
+          <option value="2023-24">2023–24</option>
+          <option value="2024-25">2024–25</option>
+          <option value="2025-26" selected>2025–26</option>
+        </select>
+      </label>
+      <label>Material
+        <select id="materialSelect">
+          <option value="ALL">All materials</option>
+          <option value="Metals">Metals</option>
+          <option value="Paper & cardboard">Paper &amp; cardboard</option>
+          <option value="Plastics">Plastics</option>
+          <option value="Glass">Glass</option>
+          <option value="Tyres">Tyres</option>
+          <option value="Textiles">Textiles</option>
+          <option value="Hazardous (excl. tyres)">Hazardous (excl. tyres)</option>
+          <option value="Non-core waste">Non-core waste</option>
+          <option value="Other core waste">Other core waste</option>
+        </select>
+      </label>
     </div>
 
-    <!-- SECTION 3 -->
-    <h2>Section 3: Interactive Multi-View Exploration</h2>
     <div class="pure-g">
-        <div class="pure-u-1 chart-card">
-            <div id="multiview" class="vis-container"></div>
-        </div>
+      <div class="pure-u-1 pure-u-md-2-3">
+        <div class="chart-card"><div id="flow_map" class="vis-container"></div></div>
+        <p class="source">Each curve is one state-to-country route, with materials combined; thicker means more tonnes. Routes under 1,000 tonnes are hidden. Exports to Belgium and the USA run off the edge of the map.</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-1-3 text-col">
+        <h3>Who takes it</h3>
+        <p>In 2017–18 <strong>China</strong> was the biggest buyer of our waste, taking 18.5% of exports. By 2021–22 its share had fallen to 2%.</p>
+        <p><strong>Indonesia</strong> (26% in 2025–26) and <strong>Bangladesh</strong> (17%) took most of the slack.</p>
+        <p><strong>Metals</strong> are 61% of everything exported and paper and cardboard another 23%. Switch to <em>Plastics</em> or <em>Glass</em> and the map almost empties.</p>
+      </div>
     </div>
-</div>
+
+    <h3>Which states export it, and what</h3>
+    <div class="chart-card"><div id="bar_chart" class="vis-container"></div></div>
+
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-2-3">
+        <h3>China fell from 1st to 8th</h3>
+        <div class="chart-card"><div id="export_bump" class="vis-container"></div></div>
+        <p class="source">Rank of each country by tonnes received from Australia. Only countries that reached the top six at least once are shown. Hover a dot for tonnes.</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-1-3 text-col">
+        <h3>&nbsp;</h3>
+        <p>Bangladesh climbed from 8th to 2nd, and briefly 1st in 2023–24, almost entirely by buying Australian scrap metal (99.6% of its tonnes).</p>
+        <p class="callout">Australia also chose to stop some exports. Between 2021 and 2024, export bans or licences were phased in for glass, plastics, tyres and mixed paper. The next chart shows what changed.</p>
+      </div>
+    </div>
+
+    <h3>Export bans cut plastic and glass exports, but tyre exports kept climbing</h3>
+    <div class="chart-card"><div id="export_bans"></div></div>
+    <p class="source">Dashed lines mark when each rule started. Each panel has its own scale: paper exports are about 70 times larger than plastics exports. Each point is a whole financial year, plotted at 30 June.</p>
+  </section>
+
+  <!-- ===================== SECTION 5 ===================== -->
+  <section id="s5">
+    <p class="section-num">05 · Where it's processed</p>
+    <h2>Australia has almost 15 landfills for every plastics recycler</h2>
+    <p class="lede">Every circle is a recycling site and every grey triangle is a landfill. Filter by material, hide the landfills, or zoom to your state.</p>
+    <div class="chart-card"><div id="facility_map"></div></div>
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-2 text-col">
+        <p>The 2022 national infrastructure database lists <strong>1,269 landfills</strong>, but only
+           <strong>87 plastics</strong>, <strong>65 paper</strong> and <strong>22 glass</strong> reprocessing sites.</p>
+        <p>Recyclers cluster around Melbourne, Sydney, Brisbane, Adelaide and Perth. <strong>Victoria</strong> hosts
+           39 of the 87 plastics reprocessors.</p>
+      </div>
+      <div class="pure-u-1 pure-u-md-1-2 text-col">
+        <p>Across most of Western Australia, Queensland and the Northern Territory, the nearest option is a landfill.
+           The NT has 117 landfills and 6 recycling sites. Distance helps explain why the NT and Queensland trail the map in section 03.</p>
+        <p class="source">These are counts of sites, not how much each one can process.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONCLUSION ===================== -->
+  <section id="s6" class="conclusion">
+    <p class="section-num">06 · So, are we getting better?</p>
+    <h2>Yes, but mostly with the heavy stuff</h2>
+    <div class="pure-g">
+      <div class="pure-u-1 pure-u-md-1-3"><div class="takeaway"><h4>The headline is flattering</h4><p>The rise to 67.5% is driven by building rubble. Without it, recovery has barely moved since 2018–19.</p></div></div>
+      <div class="pure-u-1 pure-u-md-1-3"><div class="takeaway"><h4>Household materials are slipping</h4><p>Paper and glass recovery have fallen since the target was set, and plastics are stuck near 13%.</p></div></div>
+      <div class="pure-u-1 pure-u-md-1-3"><div class="takeaway"><h4>Exporting less means processing more here</h4><p>Bans have cut plastic and glass exports, but recycling sites are few and concentrated in the big cities.</p></div></div>
+    </div>
+    <p class="lede">At the current pace Australia reaches about 71% by 2030. Closing the last nine points means fixing the materials
+       that pass through our own bins, not just the ones that come off building sites.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap pure-g">
+    <div class="pure-u-1 pure-u-md-2-3">
+      <h4>Data sources</h4>
+      <ul>
+        <li>Department of Climate Change, Energy, the Environment and Water (DCCEEW), <em>National Waste and Resource Recovery Database 2026</em>, released September 2026. Recovery rates by year, state and material (sections 01–03). <a href="https://www.dcceew.gov.au/environment/protection/waste/how-we-manage-waste/data-hub/data-insights/national-data-viewer">dcceew.gov.au</a></li>
+        <li><em>Australian waste and recovered material exports by state, destination and material, 2017–18 to 2025–26</em> (section 04). <!-- TODO: add the publisher and URL of export_flows.csv --> [ADD SOURCE AND URL]</li>
+        <li>DCCEEW / Blue Environment, <em>Australian waste and resource recovery infrastructure database 2022</em> (version 4, April 2022). Facility locations (section 05).</li>
+        <li>Parliament of Australia, Senate Environment and Communications Committee, inquiry report, Chapter 7: <em>Waste export regulations and the Recycling Modernisation Fund</em> (2025). Export regulation dates. <a href="https://www.aph.gov.au/Parliamentary_Business/Committees/Senate/Environment_and_Communications/Wastereduction/Report/Chapter_7_-_Waste_export_regulations_and_the_Recycling_Modernisation_Fund">aph.gov.au</a></li>
+      </ul>
+    </div>
+    <div class="pure-u-1 pure-u-md-1-3">
+      <h4>About</h4>
+      <p>Tristan Wen Ern Tan 34077049 Studio 18.</p>
+      <p><strong>AI Usage:</strong> Claude was used to clean the data sources and aggregate as as needed, get feedback on the visual layout and translate it into css and html code, fix bugs and improve the visualisation of charts, provide feedback on the section to improve the flow of storytelling.</p>
+    </div>
+  </div>
+</footer>
 
 <script>
-    let viewMap, viewBar;
+  // Render every chart after the web fonts load, so Vega measures label widths with the right font.
+  const embedOpts = {actions: false, renderer: 'svg'};
+  const charts = {
+    national_trend: 'specs/national_trend.json',
+    material_waffle: 'specs/material_waffle.json',
+    material_heatmap: 'specs/material_heatmap.json',
+    material_slope: 'specs/material_slope.json',
+    state_map: 'specs/state_map.json',
+    state_dumbbell: 'specs/state_dumbbell.json',
+    export_bump: 'specs/export_bump.json',
+    export_bans: 'specs/export_bans.json',
+    facility_map: 'specs/facility_map.json'
+  };
 
-    // Embed Map
-    vegaEmbed('#flow_map', 'flow_map.json', {"actions": false})
-        .then(result => { viewMap = result.view; })
-        .catch(console.error);
+  let viewMap, viewBar;
 
-    // Embed Bar Chart
-    vegaEmbed('#bar_chart', 'bar_chart.json', {"actions": false})
-        .then(result => { viewBar = result.view; })
-        .catch(console.error);
-
-    // Function to update signal parameters on both charts simultaneously
-    function updateFilters() {
-        const year = document.getElementById('yearSelect').value;
-        const materialVal = document.getElementById('materialSelect').value;
-        const material = materialVal === 'ALL' ? null : materialVal;
-
-        if (viewMap) {
-        viewMap.signal('Year_selection', year).signal('Material_selection', material).runAsync();
-        }
-        if (viewBar) {
-        viewBar.signal('Year_selection', year).signal('Material_selection', material).runAsync();
-        }
+  document.fonts.ready.then(() => {
+    for (const [id, spec] of Object.entries(charts)) {
+      vegaEmbed('#' + id, spec, embedOpts).catch(console.error);
     }
+    // The flow map and bar chart share the year/material dropdowns above them.
+    vegaEmbed('#flow_map', 'specs/flow_map.json', embedOpts)
+      .then(result => { viewMap = result.view; updateFilters(); })
+      .catch(console.error);
+    vegaEmbed('#bar_chart', 'specs/bar_chart.json', embedOpts)
+      .then(result => { viewBar = result.view; updateFilters(); })
+      .catch(console.error);
+  });
 
-    // Attach event listeners to dropdowns
-    document.getElementById('yearSelect').addEventListener('change', updateFilters);
-    document.getElementById('materialSelect').addEventListener('change', updateFilters);
+  // Push the dropdown values into the Year_selection / Material_selection params of both charts
+  function updateFilters() {
+    const year = document.getElementById('yearSelect').value;
+    const materialVal = document.getElementById('materialSelect').value;
+    const material = materialVal === 'ALL' ? null : materialVal;
+    for (const view of [viewMap, viewBar]) {
+      if (view) view.signal('Year_selection', year).signal('Material_selection', material).runAsync();
+    }
+  }
+
+  document.getElementById('yearSelect').addEventListener('change', updateFilters);
+  document.getElementById('materialSelect').addEventListener('change', updateFilters);
 </script>
 
 </body>

@@ -1,0 +1,125 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Dumbbell chart: each state's recovery rate in 2018-19 (before the 80% target) and 2024-25, against the target.",
+  "width": "container",
+  "height": 300,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/state_rate.csv",
+    "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number"}}
+  },
+  "transform": [
+    {"filter": {"field": "Year", "oneOf": ["2018-19", "2024-25"]}},
+    {"pivot": "Year", "value": "rate", "groupby": ["state", "abbr"]},
+    {"calculate": "datum['2024-25'] - datum['2018-19']", "as": "change"},
+    {"calculate": "80 - datum['2024-25']", "as": "gap"}
+  ],
+  "encoding": {
+    "y": {
+      "field": "state",
+      "type": "nominal",
+      "title": null,
+      "sort": {"field": "2024-25", "order": "descending"},
+      "axis": {
+        "domain": false,
+        "ticks": false,
+        "labelFontSize": 12.5,
+        "labelFontWeight": 600,
+        "labelPadding": 8
+      }
+    }
+  },
+  "layer": [
+    {
+      "description": "80% target",
+      "mark": {"type": "rule", "color": "#1b4332", "strokeDash": [6, 4], "strokeWidth": 1.5},
+      "encoding": {"x": {"datum": 80, "type": "quantitative"}, "y": {"value": 0}, "y2": {"value": 300}},
+      "data": {"values": [{}]}
+    },
+    {
+      "mark": {
+        "type": "text",
+        "text": "Target 80%",
+        "align": "center",
+        "baseline": "bottom",
+        "dy": -4,
+        "fontSize": 11.5,
+        "fontWeight": 600,
+        "color": "#1b4332"
+      },
+      "encoding": {"x": {"datum": 80, "type": "quantitative"}, "y": {"value": -4}},
+      "data": {"values": [{}]}
+    },
+    {
+      "mark": {"type": "rule", "strokeWidth": 3, "color": "#b7c9b9"},
+      "encoding": {
+        "x": {
+          "field": "2018-19",
+          "type": "quantitative",
+          "title": "Share of waste recovered (%)",
+          "scale": {"domain": [0, 105]},
+          "axis": {"values": [0, 20, 40, 60, 80], "grid": true}
+        },
+        "x2": {"field": "2024-25"}
+      }
+    },
+    {
+      "description": "Fold the two years back into rows so both dots share one colour legend",
+      "transform": [{"fold": ["2018-19", "2024-25"], "as": ["year", "value"]}],
+      "mark": {"type": "point", "filled": true, "size": 110, "opacity": 1},
+      "encoding": {
+        "x": {"field": "value", "type": "quantitative"},
+        "color": {
+          "field": "year",
+          "type": "nominal",
+          "title": null,
+          "scale": {"domain": ["2018-19", "2024-25"], "range": ["#a3a3a3", "#2d6a4f"]},
+          "legend": {
+            "orient": "top",
+            "direction": "horizontal",
+            "labelExpr": "datum.label == '2018-19' ? '2018–19 (before the target was set)' : '2024–25 (latest)'",
+            "symbolSize": 110,
+            "labelLimit": 320
+          }
+        },
+        "tooltip": [
+          {"field": "state", "type": "nominal", "title": "State"},
+          {"field": "year", "type": "nominal", "title": "Financial year"},
+          {"field": "value", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"}
+        ]
+      }
+    },
+    {
+      "description": "Change label to the right of each dumbbell, kept clear of the target line",
+      "transform": [
+        {"calculate": "max(datum['2018-19'], datum['2024-25'], 81)", "as": "right_end"},
+        {
+          "calculate": "(datum.change >= 0 ? '+' : '−') + format(abs(datum.change), '.0f') + ' pts' + (datum.gap <= 0 ? '  · target met' : '  · ' + format(datum.gap, '.0f') + ' to go')",
+          "as": "label"
+        }
+      ],
+      "mark": {"type": "text", "align": "left", "dx": 10, "fontSize": 11.5},
+      "encoding": {
+        "x": {"field": "right_end", "type": "quantitative"},
+        "text": {"field": "label"},
+        "color": {"condition": {"test": "datum.change < 0", "value": "#c0392b"}, "value": "#444"}
+      }
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 12,
+      "titleFontWeight": 600,
+      "labelColor": "#4a4a4a",
+      "titleColor": "#333",
+      "gridColor": "#ececec",
+      "domainColor": "#bbb",
+      "tickColor": "#bbb"
+    },
+    "legend": {"labelFontSize": 12}
+  },
+  "padding": {"left": 5, "right": 30, "top": 5, "bottom": 5}
+}

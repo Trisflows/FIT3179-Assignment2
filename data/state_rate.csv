@@ -1,0 +1,129 @@
+Year,fy_end,abbr,rate,generated_mt,state
+2006-07,2007,ACT,73.7,0.717,Australian Capital Territory
+2006-07,2007,NSW,57.8,22.357,New South Wales
+2006-07,2007,NT,10.6,0.521,Northern Territory
+2006-07,2007,Qld,35.2,14.234,Queensland
+2006-07,2007,SA,76.1,3.568,South Australia
+2006-07,2007,Tas,41.6,0.803,Tasmania
+2006-07,2007,Vic,49.9,13.441,Victoria
+2006-07,2007,WA,36.8,6.959,Western Australia
+2008-09,2009,ACT,72.9,0.747,Australian Capital Territory
+2008-09,2009,NSW,54.0,25.021,New South Wales
+2008-09,2009,NT,16.7,0.337,Northern Territory
+2008-09,2009,Qld,34.8,14.378,Queensland
+2008-09,2009,SA,76.4,3.742,South Australia
+2008-09,2009,Tas,47.6,0.759,Tasmania
+2008-09,2009,Vic,52.2,12.707,Victoria
+2008-09,2009,WA,35.0,7.138,Western Australia
+2009-10,2010,ACT,75.7,0.722,Australian Capital Territory
+2009-10,2010,NSW,60.8,23.648,New South Wales
+2009-10,2010,NT,16.2,0.339,Northern Territory
+2009-10,2010,Qld,33.3,13.603,Queensland
+2009-10,2010,SA,76.0,3.736,South Australia
+2009-10,2010,Tas,49.9,0.813,Tasmania
+2009-10,2010,Vic,56.0,14.151,Victoria
+2009-10,2010,WA,34.3,8.5,Western Australia
+2010-11,2011,ACT,73.9,0.906,Australian Capital Territory
+2010-11,2011,NSW,68.1,23.301,New South Wales
+2010-11,2011,NT,16.5,0.345,Northern Territory
+2010-11,2011,Qld,38.0,13.403,Queensland
+2010-11,2011,SA,78.9,4.294,South Australia
+2010-11,2011,Tas,47.9,0.894,Tasmania
+2010-11,2011,Vic,55.8,14.622,Victoria
+2010-11,2011,WA,45.8,7.488,Western Australia
+2013-14,2014,ACT,75.1,0.861,Australian Capital Territory
+2013-14,2014,NSW,68.4,23.148,New South Wales
+2013-14,2014,NT,14.6,0.541,Northern Territory
+2013-14,2014,Qld,40.4,14.264,Queensland
+2013-14,2014,SA,74.9,4.355,South Australia
+2013-14,2014,Tas,55.9,0.942,Tasmania
+2013-14,2014,Vic,62.2,13.838,Victoria
+2013-14,2014,WA,57.8,7.006,Western Australia
+2014-15,2015,ACT,70.9,0.731,Australian Capital Territory
+2014-15,2015,NSW,67.5,22.904,New South Wales
+2014-15,2015,NT,20.1,0.462,Northern Territory
+2014-15,2015,Qld,39.9,14.461,Queensland
+2014-15,2015,SA,77.0,4.361,South Australia
+2014-15,2015,Tas,51.3,0.973,Tasmania
+2014-15,2015,Vic,62.5,14.34,Victoria
+2014-15,2015,WA,51.6,7.747,Western Australia
+2015-16,2016,ACT,71.1,0.889,Australian Capital Territory
+2015-16,2016,NSW,66.4,23.816,New South Wales
+2015-16,2016,NT,16.1,0.334,Northern Territory
+2015-16,2016,Qld,39.4,14.639,Queensland
+2015-16,2016,SA,76.4,4.56,South Australia
+2015-16,2016,Tas,54.5,1.079,Tasmania
+2015-16,2016,Vic,65.1,15.238,Victoria
+2015-16,2016,WA,55.7,6.86,Western Australia
+2016-17,2017,ACT,52.5,0.96,Australian Capital Territory
+2016-17,2017,NSW,69.5,25.638,New South Wales
+2016-17,2017,NT,16.4,0.381,Northern Territory
+2016-17,2017,Qld,39.5,15.857,Queensland
+2016-17,2017,SA,83.1,4.226,South Australia
+2016-17,2017,Tas,55.3,0.943,Tasmania
+2016-17,2017,Vic,64.8,15.643,Victoria
+2016-17,2017,WA,60.9,6.37,Western Australia
+2017-18,2018,ACT,70.0,0.943,Australian Capital Territory
+2017-18,2018,NSW,71.1,25.628,New South Wales
+2017-18,2018,NT,17.2,0.396,Northern Territory
+2017-18,2018,Qld,42.2,17.425,Queensland
+2017-18,2018,SA,84.3,4.684,South Australia
+2017-18,2018,Tas,47.6,0.833,Tasmania
+2017-18,2018,Vic,67.3,17.404,Victoria
+2017-18,2018,WA,60.9,6.595,Western Australia
+2018-19,2019,ACT,78.5,1.112,Australian Capital Territory
+2018-19,2019,NSW,68.2,25.378,New South Wales
+2018-19,2019,NT,25.6,0.447,Northern Territory
+2018-19,2019,Qld,46.4,17.45,Queensland
+2018-19,2019,SA,84.7,4.489,South Australia
+2018-19,2019,Tas,51.8,0.978,Tasmania
+2018-19,2019,Vic,67.7,17.981,Victoria
+2018-19,2019,WA,62.3,6.86,Western Australia
+2019-20,2020,ACT,64.7,0.963,Australian Capital Territory
+2019-20,2020,NSW,65.6,25.96,New South Wales
+2019-20,2020,NT,16.3,0.383,Northern Territory
+2019-20,2020,Qld,47.5,14.817,Queensland
+2019-20,2020,SA,83.0,4.637,South Australia
+2019-20,2020,Tas,51.5,0.914,Tasmania
+2019-20,2020,Vic,66.6,18.637,Victoria
+2019-20,2020,WA,64.0,7.581,Western Australia
+2020-21,2021,ACT,65.2,0.912,Australian Capital Territory
+2020-21,2021,NSW,68.0,25.665,New South Wales
+2020-21,2021,NT,18.3,0.45,Northern Territory
+2020-21,2021,Qld,48.0,15.425,Queensland
+2020-21,2021,SA,80.8,5.572,South Australia
+2020-21,2021,Tas,51.0,0.891,Tasmania
+2020-21,2021,Vic,64.9,18.092,Victoria
+2020-21,2021,WA,64.6,7.986,Western Australia
+2021-22,2022,ACT,75.3,1.136,Australian Capital Territory
+2021-22,2022,NSW,72.7,26.941,New South Wales
+2021-22,2022,NT,29.6,0.52,Northern Territory
+2021-22,2022,Qld,47.7,14.925,Queensland
+2021-22,2022,SA,82.2,4.826,South Australia
+2021-22,2022,Tas,36.2,0.795,Tasmania
+2021-22,2022,Vic,65.4,16.933,Victoria
+2021-22,2022,WA,68.4,8.577,Western Australia
+2022-23,2023,ACT,73.0,1.195,Australian Capital Territory
+2022-23,2023,NSW,73.1,27.528,New South Wales
+2022-23,2023,NT,34.3,0.421,Northern Territory
+2022-23,2023,Qld,47.4,15.259,Queensland
+2022-23,2023,SA,82.4,5.242,South Australia
+2022-23,2023,Tas,55.6,1.106,Tasmania
+2022-23,2023,Vic,66.4,16.312,Victoria
+2022-23,2023,WA,68.6,8.824,Western Australia
+2023-24,2024,ACT,71.1,1.255,Australian Capital Territory
+2023-24,2024,NSW,72.6,26.756,New South Wales
+2023-24,2024,NT,44.5,0.381,Northern Territory
+2023-24,2024,Qld,51.5,16.425,Queensland
+2023-24,2024,SA,78.0,5.192,South Australia
+2023-24,2024,Tas,57.5,1.309,Tasmania
+2023-24,2024,Vic,65.5,15.564,Victoria
+2023-24,2024,WA,69.4,8.948,Western Australia
+2024-25,2025,ACT,68.7,1.181,Australian Capital Territory
+2024-25,2025,NSW,74.3,27.922,New South Wales
+2024-25,2025,NT,44.5,0.508,Northern Territory
+2024-25,2025,Qld,54.4,17.528,Queensland
+2024-25,2025,SA,80.1,5.647,South Australia
+2024-25,2025,Tas,63.0,1.414,Tasmania
+2024-25,2025,Vic,66.2,15.678,Victoria
+2024-25,2025,WA,67.9,9.115,Western Australia

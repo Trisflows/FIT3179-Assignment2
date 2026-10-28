@@ -1,0 +1,11 @@
+material,fate,order,pct,cum_start,cum_end,label
+Glass,Recycled or reused,0,54,0,54,Glass — 54% recycled
+Glass,Landfilled,2,46,54,100,Glass — 54% recycled
+Metals,Recycled or reused,0,89,0,89,Metals — 89% recycled
+Metals,Landfilled,2,11,89,100,Metals — 89% recycled
+Paper & cardboard,Recycled or reused,0,49,0,49,Paper & cardboard — 49% recycled
+Paper & cardboard,Burned for energy,1,6,49,55,Paper & cardboard — 49% recycled
+Paper & cardboard,Landfilled,2,45,55,100,Paper & cardboard — 49% recycled
+Plastics,Recycled or reused,0,12,0,12,Plastics — 12% recycled
+Plastics,Burned for energy,1,2,12,14,Plastics — 12% recycled
+Plastics,Landfilled,2,86,14,100,Plastics — 12% recycled

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Heatmap of resource recovery rate by material and financial year. Colour classes are anchored on the 80% national target.",
+  "width": "container",
+  "height": 300,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/material_rate.csv",
+    "format": {"type": "csv", "parse": {"rate": "number", "fy_end": "number", "generated_mt": "number"}}
+  },
+  "layer": [
+    {
+      "params": [
+        {
+          "name": "material_hover",
+          "select": {"type": "point", "fields": ["material"], "on": "pointerover", "clear": "pointerout"}
+        }
+      ],
+      "mark": {"type": "rect", "stroke": "white", "strokeWidth": 1.5, "cursor": "pointer"},
+      "encoding": {
+        "x": {
+          "field": "Year",
+          "type": "ordinal",
+          "title": null,
+          "sort": {"field": "fy_end"},
+          "axis": {
+            "orient": "top",
+            "labelAngle": 0,
+            "labelFontSize": 11,
+            "domain": false,
+            "ticks": false,
+            "labelExpr": "substring(datum.label, 2, 4) + '–' + substring(datum.label, 5, 7)"
+          }
+        },
+        "y": {
+          "field": "material",
+          "type": "nominal",
+          "title": null,
+          "sort": [
+            "Metals",
+            "Building rubble",
+            "Organics",
+            "Paper & cardboard",
+            "Glass",
+            "Hazardous waste",
+            "Plastics",
+            "Textiles & rubber"
+          ],
+          "axis": {
+            "domain": false,
+            "ticks": false,
+            "labelFontSize": 12.5,
+            "labelFontWeight": 600,
+            "labelPadding": 8
+          }
+        },
+        "color": {
+          "field": "rate",
+          "type": "quantitative",
+          "title": "Share recovered",
+          "scale": {
+            "type": "threshold",
+            "domain": [25, 40, 55, 70, 80],
+            "range": ["#fbe3d6", "#edf8e9", "#bae4b3", "#74c476", "#31a354", "#006d2c"]
+          },
+          "legend": {
+            "orient": "bottom",
+            "direction": "horizontal",
+            "titleOrient": "left",
+            "titlePadding": 12,
+            "labelOverlap": false,
+            "labelExpr": "isValid(datum.label) ? datum.label + '%' : ''"
+          }
+        },
+        "opacity": {"condition": {"param": "material_hover", "empty": true, "value": 1}, "value": 0.35},
+        "tooltip": [
+          {"field": "material", "type": "nominal", "title": "Material"},
+          {"field": "Year", "type": "nominal", "title": "Financial year"},
+          {"field": "rate", "type": "quantitative", "title": "Recovered (%)", "format": ".1f"},
+          {
+            "field": "generated_mt",
+            "type": "quantitative",
+            "title": "Waste generated (million tonnes)",
+            "format": ".2f"
+          }
+        ]
+      }
+    },
+    {
+      "description": "Print the value inside each cell; white text on the dark classes",
+      "mark": {"type": "text", "fontSize": 10.5, "fontWeight": 500},
+      "encoding": {
+        "x": {"field": "Year", "type": "ordinal", "sort": {"field": "fy_end"}},
+        "y": {
+          "field": "material",
+          "type": "nominal",
+          "sort": [
+            "Metals",
+            "Building rubble",
+            "Organics",
+            "Paper & cardboard",
+            "Glass",
+            "Hazardous waste",
+            "Plastics",
+            "Textiles & rubber"
+          ]
+        },
+        "text": {"field": "rate", "type": "quantitative", "format": ".0f"},
+        "color": {"condition": {"test": "datum.rate >= 70", "value": "white"}, "value": "#333"},
+        "opacity": {"condition": {"param": "material_hover", "empty": true, "value": 1}, "value": 0.35}
+      }
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "axis": {"labelColor": "#333", "titleColor": "#333"},
+    "legend": {"labelFontSize": 12, "titleFontSize": 12, "titleFontWeight": 600}
+  }
+}

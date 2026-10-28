@@ -1,0 +1,73 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Waffle charts (small multiples): what happened to every 100 tonnes of four household materials in 2024-25. Each square is 1% of that material's waste.",
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/material_fate_2024-25.csv",
+    "format": {
+      "type": "csv",
+      "parse": {"pct": "number", "cum_start": "number", "cum_end": "number", "order": "number"}
+    }
+  },
+  "transform": [
+    {
+      "description": "Turn each fate share into that many 1% squares (e.g. 54% recycled -> squares 1 to 54)",
+      "calculate": "sequence(datum.cum_start + 1, datum.cum_end + 1)",
+      "as": "square"
+    },
+    {"flatten": ["square"]},
+    {"calculate": "(datum.square - 1) % 10", "as": "col"},
+    {"calculate": "floor((datum.square - 1) / 10)", "as": "row"}
+  ],
+  "facet": {
+    "column": {
+      "field": "label",
+      "type": "nominal",
+      "title": null,
+      "sort": [
+        "Metals — 89% recycled",
+        "Glass — 54% recycled",
+        "Paper & cardboard — 49% recycled",
+        "Plastics — 12% recycled"
+      ],
+      "header": {"labelFontSize": 13.5, "labelFontWeight": 700, "labelColor": "#222", "labelPadding": 8}
+    }
+  },
+  "spacing": 44,
+  "spec": {
+    "width": 140,
+    "height": 140,
+    "mark": {"type": "rect", "cornerRadius": 2},
+    "encoding": {
+      "x": {"field": "col", "type": "ordinal", "axis": null, "scale": {"paddingInner": 0.14}},
+      "y": {"field": "row", "type": "ordinal", "axis": null, "scale": {"paddingInner": 0.14}},
+      "color": {
+        "field": "fate",
+        "type": "nominal",
+        "title": "Each square = 1% of that material's waste",
+        "scale": {
+          "domain": ["Recycled or reused", "Burned for energy", "Landfilled"],
+          "range": ["#2d6a4f", "#e9c46a", "#cfc8bd"]
+        },
+        "legend": {
+          "orient": "bottom",
+          "direction": "horizontal",
+          "symbolType": "square",
+          "symbolSize": 160,
+          "titleOrient": "top",
+          "titlePadding": 6,
+          "columnPadding": 18
+        }
+      },
+      "tooltip": [
+        {"field": "material", "type": "nominal", "title": "Material"},
+        {"field": "fate", "type": "nominal", "title": "What happened to it"},
+        {"field": "pct", "type": "quantitative", "title": "Share of tonnes (%)"}
+      ]
+    }
+  },
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "legend": {"labelFontSize": 12.5, "titleFontSize": 12.5, "titleFontWeight": 600, "titleLimit": 400}
+  }
+}

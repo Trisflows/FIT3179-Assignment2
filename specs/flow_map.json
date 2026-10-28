@@ -1,0 +1,180 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Flow map: tonnes of waste and recovered materials exported from each state to each destination country, drawn as great-circle arcs. The year and material are set by the dropdowns on the page (see index.html), which also drive the bar chart.",
+  "width": "container",
+  "height": 430,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "projection": {"type": "equalEarth", "rotate": [-112, 0, 0], "center": [0, -4], "scale": 215},
+  "params": [
+    {"name": "Year_selection", "value": "2025-26"},
+    {"name": "Material_selection", "value": null},
+    {"name": "Min_Tonnes", "value": 1000}
+  ],
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/world_110m.topojson",
+        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#ebe8e2", "stroke": "#ffffff", "strokeWidth": 0.6, "clip": true}
+    },
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv",
+        "format": {
+          "type": "csv",
+          "parse": {
+            "Tonnes": "number",
+            "Value ($)": "number",
+            "origin_lat": "number",
+            "origin_lon": "number",
+            "dest_lat": "number",
+            "dest_lon": "number"
+          }
+        }
+      },
+      "transform": [
+        {"filter": "isValid(datum['Material group']) && datum['Material group'] != 'NA'"},
+        {"filter": "datum['Financial Year'] == Year_selection"},
+        {"filter": "Material_selection == null || datum['Material group'] == Material_selection"},
+        {
+          "calculate": "datum.Destination == 'Korea, Republic of' ? 'South Korea' : datum.Destination",
+          "as": "Destination"
+        }
+      ],
+      "layer": [
+        {
+          "description": "One arc per state → country pair. Summing across materials keeps the map readable (about 60 arcs instead of 300 overlapping lines). Line width and circle size use fixed scales, so they mean the same tonnage in every year and for every material.",
+          "transform": [
+            {
+              "aggregate": [
+                {"op": "sum", "field": "Tonnes", "as": "tonnes"},
+                {"op": "sum", "field": "Value ($)", "as": "value"}
+              ],
+              "groupby": ["State of origin", "Destination", "origin_lat", "origin_lon", "dest_lat", "dest_lon"]
+            },
+            {"filter": "datum.tonnes >= Min_Tonnes"},
+            {
+              "description": "Build a GeoJSON line so the projection draws a curved great-circle route instead of a straight screen line",
+              "calculate": "{'type': 'LineString', 'coordinates': [[datum.origin_lon, datum.origin_lat], [datum.dest_lon, datum.dest_lat]]}",
+              "as": "route"
+            }
+          ],
+          "params": [
+            {
+              "name": "line_hover",
+              "select": {
+                "type": "point",
+                "fields": ["State of origin", "Destination"],
+                "on": "pointerover",
+                "clear": "pointerout"
+              }
+            }
+          ],
+          "mark": {"type": "geoshape", "filled": false, "strokeCap": "round", "cursor": "pointer", "clip": true},
+          "encoding": {
+            "shape": {"field": "route", "type": "geojson"},
+            "strokeWidth": {
+              "field": "tonnes",
+              "type": "quantitative",
+              "title": "Tonnes on one route",
+              "scale": {"domain": [0, 400000], "range": [0.4, 11]},
+              "legend": {
+                "orient": "none",
+                "legendX": 4,
+                "legendY": 290,
+                "format": "~s",
+                "values": [50000, 150000, 350000],
+                "symbolType": "stroke",
+                "title": "Tonnes on one route"
+              }
+            },
+            "stroke": {"condition": {"param": "line_hover", "empty": false, "value": "#0b3c49"}, "value": "#2f6f73"},
+            "strokeOpacity": {"condition": {"param": "line_hover", "empty": false, "value": 0.95}, "value": 0.4},
+            "tooltip": [
+              {"field": "State of origin", "type": "nominal", "title": "From"},
+              {"field": "Destination", "type": "nominal", "title": "To"},
+              {"field": "tonnes", "type": "quantitative", "format": ",.0f", "title": "Tonnes exported"},
+              {"field": "value", "type": "quantitative", "format": "$,.0f", "title": "Export value"}
+            ]
+          }
+        },
+        {
+          "description": "Destination circles sized by total tonnes received from all states",
+          "transform": [
+            {
+              "aggregate": [{"op": "sum", "field": "Tonnes", "as": "tonnes"}],
+              "groupby": ["Destination", "dest_lat", "dest_lon"]
+            },
+            {
+              "window": [{"op": "rank", "as": "rank"}],
+              "sort": [{"field": "tonnes", "order": "descending"}]
+            }
+          ],
+          "layer": [
+            {
+              "mark": {
+                "type": "circle",
+                "color": "#e76f51",
+                "stroke": "#ffffff",
+                "strokeWidth": 1,
+                "opacity": 0.9,
+                "clip": true
+              },
+              "encoding": {
+                "longitude": {"field": "dest_lon", "type": "quantitative"},
+                "latitude": {"field": "dest_lat", "type": "quantitative"},
+                "size": {
+                  "field": "tonnes",
+                  "type": "quantitative",
+                  "scale": {"domain": [0, 1400000], "range": [0, 700]},
+                  "legend": null
+                },
+                "tooltip": [
+                  {"field": "Destination", "type": "nominal", "title": "Country"},
+                  {
+                    "field": "tonnes",
+                    "type": "quantitative",
+                    "format": ",.0f",
+                    "title": "Total received (tonnes)"
+                  },
+                  {"field": "rank", "type": "quantitative", "title": "Rank this year"}
+                ]
+              }
+            },
+            {
+              "description": "Name the five biggest destinations",
+              "transform": [
+                {"filter": "datum.rank <= 5"},
+                {
+                  "calculate": "datum.Destination + ' ' + format(datum.tonnes / 1000, ',.0f') + 'kt'",
+                  "as": "label"
+                }
+              ],
+              "mark": {
+                "type": "text",
+                "align": "left",
+                "dx": 14,
+                "dy": -6,
+                "fontSize": 12,
+                "fontWeight": 700,
+                "color": "#7a2e1c",
+                "clip": true
+              },
+              "encoding": {
+                "longitude": {"field": "dest_lon", "type": "quantitative"},
+                "latitude": {"field": "dest_lat", "type": "quantitative"},
+                "text": {"field": "label"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "config": {
+    "font": "'Source Sans 3', sans-serif",
+    "view": {"stroke": null},
+    "legend": {"labelFontSize": 12, "titleFontSize": 12, "titleFontWeight": 600}
+  }
+}

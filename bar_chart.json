@@ -1,0 +1,75 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "title": {
+    "text": "Exports by State of Origin (Tonnes)",
+    "fontSize": 16
+  },
+  "width": "container",
+  "height": 250,
+  "autosize": {"type": "fit-x", "contains": "padding"},
+  "params": [
+    {"name": "Year_selection", "value": "2023-24"},
+    {"name": "Material_selection", "value": null}
+  ],
+  "data": {
+    "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv"
+  },
+  "transform": [
+    {"filter": "datum['Financial Year'] == Year_selection"},
+    {"filter": "Material_selection == null || datum['Material group'] == Material_selection"}
+  ],
+  "mark": {
+    "type": "bar",
+    "cornerRadiusEnd": 4
+  },
+  "encoding": {
+    "x": {
+      "field": "Tonnes",
+      "aggregate": "sum",
+      "type": "quantitative",
+      "title": "Total Exported Volume (Tonnes)",
+      "axis": {"format": "~s"}
+    },
+    "y": {
+      "field": "State of origin",
+      "type": "nominal",
+      "title": "State of Origin",
+      "sort": "-x"
+    },
+    "color": {
+      "field": "Material group",
+      "type": "nominal",
+      "title": "Material Group",
+      "scale": {
+        "domain": [
+            "Glass",
+            "Plastics",
+            "Paper & cardboard",
+            "Metals",
+            "Textiles",
+            "Tyres",
+            "Hazardous (excl. tyres)",
+            "Non-core waste",
+            "Other core waste"
+        ],
+        "range": [
+            "#2b93b3",
+            "#2ca02c",
+            "#d9822b",
+            "#4a6984",
+            "#9467bd",
+            "#333333",
+            "#d95f02",
+            "#8c8c8c",
+            "#b0a8b9"
+        ]
+    },
+      "legend": {"orient": "bottom", "columns": 3}
+    },
+    "tooltip": [
+      {"field": "State of origin", "type": "nominal", "title": "Origin State"},
+      {"field": "Material group", "type": "nominal"},
+      {"field": "Tonnes", "aggregate": "sum", "type": "quantitative", "format": ",.0f", "title": "Total Tonnes"}
+    ]
+  }
+}

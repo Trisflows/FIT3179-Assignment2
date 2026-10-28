@@ -52,18 +52,55 @@
 <div class="container">
     <h1>Recycling & Waste Management: <br> How has Australia been improving?</h1>
     <p><strong>Author:</strong> Tristan Wen Ern Tan 34077049 | <strong>Date:</strong> 27 October 2026</p>
-    <p>Australia targets an ambitious 80% average resource recovery rate by 2030. This visualisation</p>
+    <p>Australia targets an ambitious 80% average resource recovery rate by 2030. This visualisation explores our national progress.</p>
     <hr>
 
     <!-- SECTION 1 -->
     <h2>Global & National Overview</h2>
+    <!-- FILTER CONTROLS -->
+    <div style="margin-bottom: 20px; display: flex; gap: 20px; align-items: center;">
+        <label>
+            <strong>Financial Year:</strong>
+            <select id="yearSelect">
+                <option value="2017-18">2017-18</option>
+                <option value="2018-19">2018-19</option>
+                <option value="2019-20">2019-20</option>
+                <option value="2020-21">2020-21</option>
+                <option value="2021-22">2021-22</option>
+                <option value="2022-23">2022-23</option>
+                <option value="2023-24" selected>2023-24</option>
+                <option value="2024-25">2024-25</option>
+            </select>
+        </label>
+
+        <label>
+            <strong>Material Group:</strong>
+            <select id="materialSelect">
+            <option value="ALL">Show All</option>
+                <option value="Glass">Glass</option>
+                <option value="Plastics">Plastics</option>
+                <option value="Paper & cardboard">Paper & cardboard</option>
+                <option value="Metals">Metals</option>
+                <option value="Textiles">Textiles</option>
+                <option value="Tyres">Tyres</option>
+                <option value="Hazardous (excl. tyres)">Hazardous (excl. tyres)</option>
+                <option value="Non-core waste">Non-core waste</option>
+                <option value="Other core waste">Other core waste</option>
+            </select>
+        </label>
+    </div>
     <div class="pure-g">
-        <div class="pure-u-1 chart-card">
-            <div id="map1" class="vis-container"></div>
-            <script>
-                vegaEmbed('#flow_map', 'flow_map.json', {"actions": false}).catch(console.error);
-            </script>
+        <div class="pure-u-1 pure-u-md-2-3">
+            <div class="chart-card"><div id="flow_map" class="vis-container"></div></div>
         </div>
+        <div class="pure-u-1 pure-u-md-1-3" style="box-sizing: border-box; padding-left: 10px;">
+            <div class="text-card">
+                <h3>Export Insights</h3>
+                <p>Throughout the years, metals remain to be the most exported recyclable waste </p>
+                <p>From 2017 to 2020, most of the recyclable waste was diverted away from China and rerouted into Southeast Asian countries like Malaysia, Thailand, Vietnam and Indonesia.</p>
+            </div>
+        </div>
+        <div id="bar_chart" class="vis-container"></div>
     </div>
 
     <!-- SECTION 2 -->
@@ -84,10 +121,35 @@
 </div>
 
 <script>
-    // Embed Vega-Lite visualisations
-    vegaEmbed('#map1', 'chart1_global_map.json', {"actions": false}).catch(console.error);
-    vegaEmbed('#map2', 'chart2_aus_map.json', {"actions": false}).catch(console.error);
-    vegaEmbed('#multiview', 'chart3_multiview.json', {"actions": false}).catch(console.error);
+    let viewMap, viewBar;
+
+    // Embed Map
+    vegaEmbed('#flow_map', 'flow_map.json', {"actions": false})
+        .then(result => { viewMap = result.view; })
+        .catch(console.error);
+
+    // Embed Bar Chart
+    vegaEmbed('#bar_chart', 'bar_chart.json', {"actions": false})
+        .then(result => { viewBar = result.view; })
+        .catch(console.error);
+
+    // Function to update signal parameters on both charts simultaneously
+    function updateFilters() {
+        const year = document.getElementById('yearSelect').value;
+        const materialVal = document.getElementById('materialSelect').value;
+        const material = materialVal === 'ALL' ? null : materialVal;
+
+        if (viewMap) {
+        viewMap.signal('Year_selection', year).signal('Material_selection', material).runAsync();
+        }
+        if (viewBar) {
+        viewBar.signal('Year_selection', year).signal('Material_selection', material).runAsync();
+        }
+    }
+
+    // Attach event listeners to dropdowns
+    document.getElementById('yearSelect').addEventListener('change', updateFilters);
+    document.getElementById('materialSelect').addEventListener('change', updateFilters);
 </script>
 
 </body>

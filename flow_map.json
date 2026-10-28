@@ -1,79 +1,89 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "title": {
-    "text": "Australian Waste Export Flows (2017 - 2026)",
+    "text": "Global Export Flow Map",
     "fontSize": 16
   },
   "width": "container",
-  "height": 450,
+  "height": 400,
+  "autosize": {"type": "fit-x", "contains": "padding"},
   "projection": {
     "type": "equalEarth",
-    "rotate": [-150, 0, 0]
+    "rotate": [-130, 0, 0],
+    "center": [10, 0],
+    "scale": 140
   },
   "params": [
-    {
-      "name": "Year_selection",
-      "value": "2023-24",
-      "bind": {
-        "input": "select",
-        "options": ["2017-18", "2018-19", "2019-20", "2020-21", "2021-22", "2022-23", "2023-24", "2024-25"],
-        "name": "Financial Year: "
-      }
-    },
-    {
-      "name": "Material_selection",
-      "bind": {
-        "input": "select",
-        "options": [null, "Metals", "Paper & cardboard", "Plastics", "Tyres", "Textiles"],
-        "labels": ["Show All", "Metals", "Paper & cardboard", "Plastics", "Tyres", "Textiles"],
-        "name": "Material Group: "
-      }
-    }
+    {"name": "Year_selection", "value": "2023-24"},
+    {"name": "Material_selection", "value": null},
+    {"name": "Min_Tonnes", "value": 1000}
   ],
   "layer": [
     {
       "data": {
-        "url": "data/ne_110m_admin_0_countries.topojson",
-        "format": {"type": "topojson", "feature": "ne_110m_admin_0_countries"}
+        "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/ne_10m_admin_0_countries.topojson",
+        "format": {"type": "topojson", "feature": "ne_10m_admin_0_countries"}
       },
-      "mark": {
-        "type": "geoshape",
-        "fill": "#e6e6e6",
-        "stroke": "#ffffff",
-        "strokeWidth": 0.5
-      }
+      "mark": {"type": "geoshape", "fill": "#eaeaea", "stroke": "#ffffff", "strokeWidth": 0.6}
     },
     {
       "data": {
-        "url": "data/export_flows.csv"
+        "url": "https://raw.githubusercontent.com/Trisflows/FIT3179-Assignment2/main/data/export_flows.csv"
       },
       "transform": [
         {"filter": "datum['Financial Year'] == Year_selection"},
-        {"filter": "Material_selection == null || datum['Material group'] == Material_selection"}
+        {"filter": "Material_selection == null || datum['Material group'] == Material_selection"},
+        {"filter": "datum.Tonnes >= Min_Tonnes"}
       ],
       "layer": [
         {
-          "mark": {
-            "type": "rule",
-            "opacity": 0.65,
-            "strokeCap": "round"
-          },
+          "params": [
+            {"name": "line_hover", "select": {"type": "point", "on": "pointerover", "clear": "pointerout"}}
+          ],
+          "mark": {"type": "rule", "strokeCap": "round", "cursor": "pointer"},
           "encoding": {
             "longitude": {"field": "origin_lon", "type": "quantitative"},
             "latitude": {"field": "origin_lat", "type": "quantitative"},
-            "longitude2": {"field": "dest_lon", "type": "quantitative"},
-            "latitude2": {"field": "dest_lat", "type": "quantitative"},
+            "longitude2": {"field": "dest_lon"},
+            "latitude2": {"field": "dest_lat"},
             "strokeWidth": {
               "field": "Tonnes",
               "type": "quantitative",
               "title": "Export Volume (Tonnes)",
-              "scale": {"range": [1, 10]}
+              "scale": {"range": [1.5, 10]}
             },
             "color": {
               "field": "Material group",
               "type": "nominal",
               "title": "Material Group",
-              "scale": {"scheme": "category10"}
+              "scale": {"domain": [
+                            "Glass",
+                            "Plastics",
+                            "Paper & cardboard",
+                            "Metals",
+                            "Textiles",
+                            "Tyres",
+                            "Hazardous (excl. tyres)",
+                            "Non-core waste",
+                            "Other core waste"
+                        ],
+                        "range": [
+                            "#2b93b3",
+                            "#2ca02c",
+                            "#d9822b",
+                            "#4a6984",
+                            "#9467bd",
+                            "#333333",
+                            "#d95f02",
+                            "#8c8c8c",
+                            "#b0a8b9"
+                        ]
+                    },
+              "legend": {"orient": "bottom", "columns": 3}
+            },
+            "opacity": {
+              "condition": {"param": "line_hover", "value": 1.0},
+              "value": 0.25
             },
             "tooltip": [
               {"field": "Financial Year", "type": "nominal"},
@@ -86,17 +96,20 @@
           }
         },
         {
-          "mark": {
-            "type": "circle",
-            "fill": "#1f77b4",
-            "size": 35,
-            "opacity": 0.8
-          },
+          "mark": {"type": "circle", "color": "#1f77b4", "stroke": "#ffffff", "strokeWidth": 1},
           "encoding": {
             "longitude": {"field": "dest_lon", "type": "quantitative"},
             "latitude": {"field": "dest_lat", "type": "quantitative"},
+            "size": {
+              "field": "Tonnes",
+              "aggregate": "sum",
+              "type": "quantitative",
+              "title": "Total Received (Tonnes)",
+              "scale": {"range": [30, 300]}
+            },
             "tooltip": [
-              {"field": "Destination", "type": "nominal", "title": "Destination Country"}
+              {"field": "Destination", "type": "nominal", "title": "Destination Country"},
+              {"field": "Tonnes", "aggregate": "sum", "type": "quantitative", "format": ",.0f", "title": "Total Received (Tonnes)"}
             ]
           }
         }
